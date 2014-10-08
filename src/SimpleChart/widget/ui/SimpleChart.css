@@ -5,12 +5,13 @@
 .SimpleChartFilterOpen {
 	display:block;
 	position:absolute;
-	right:15px;
-	top: 25px;
+	right:10px;
+	top: 30px;
 	padding-right: 15px;
 	cursor: pointer;
 	font-weight: bold;
 	background: url(SimpleChart/widget/ui/filter_arrow.png) no-repeat right 7px;
+	font-size: 90%;
 }
 
 .SimpleChartFilterClose {
@@ -52,8 +53,16 @@
 }
 
 .SimpleChartFilterInput {
-	width: 85px;
+	width: 83px;
 	padding: 1px;
+	margin-right: 4px;
+}
+
+.SimpleChartFilterUpdate span,
+.SimpleChartFilterClear span {
+	border: 0px solid #fff;
+	padding: inherit;
+	margin: inherit;
 }
 
 .SimpleChartFilterUpdate{
@@ -79,7 +88,7 @@
 	font-size:large;
 	left:180px;
 	position:absolute;
-	top: 20px !important;
+	top: 10px !important;
 }
 
 .SimpleChartXAxis {
@@ -88,7 +97,7 @@
 
 .SimpleChartYAxis {
 	left: 10px !important;
-	top: 25px !important;
+	top: 15px !important;
 	font-weight: bold;
 	font-size: 11px;
 }
@@ -138,11 +147,33 @@
 }
 .dijitCheckBox input, 
 .dijitRadio input {
+	opacity: 0.9;
 	cursor: pointer;
+	margin: 0px;
+}
+.dijitCheckBox , 
+.dijitRadio  {
+	width: 20px;
 }
 .legendColorBox {
 	padding-bottom: 1px;
 }
 .legendLabel {
 	padding: 0 0 1px 5px;
+}
+
+.VerticalLabels .xAxis .tickLabel {
+    text-align: right !important;
+    transform: rotate(270deg);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.9, M12=-0.9, M21=0.6, M22=-20,sizingMethod='auto expand');";
+	/*-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.00000000, M12=1.00000000, M21=-1.00000000, M22=0.00000000,sizingMethod='auto expand')";*/
+	/*filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.00000000, M12=1.00000000, M21=-1.00000000, M22=0.00000000,sizingMethod='auto expand');*/
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.9, M12=-0.6, M21=0.5, M22=-20,sizingMethod='auto expand');
+
+	-moz-transform:  matrix(0.9, -0.9, 0.6, 0.5, -20, 8);
+
+/*	-webkit-transform:  matrix(0.00000000, -1.00000000, 1.00000000, 0.00000000, 0, 0);*/
+	-webkit-transform:  matrix(0.9, -0.9, 0.6, 0.5, -20, 8);
+
+	-o-transform:  matrix(0.9, -0.9, 0.6, 0.5, -20, 8);
 }

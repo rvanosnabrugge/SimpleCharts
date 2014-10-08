@@ -46,11 +46,19 @@ dojo.setObject("SimpleChart.widget.flot", {
 				},
 				xaxis : {
 					show : true,
-					ticks : this.showxticks ? (this.iscategoreis ? null : this.wwidth / 100) : 0,
+					ticks : this.showxticks ? (this.iscategories ? null : this.wwidth / 100) : 0,
 					tickFormatter : function(tick, axis) {
-						if (self.charttype == 'bar') {
-							if (tick < self.series[0].data.length && self.series[0].data[tick])
-								return self.series[0].data[tick].labelx;
+						if( self.iscategories ) {
+							if( tick >= 0 && tick < self.categoriesArray.length ) {
+								return self.categoriesArray[tick];
+							}
+						}
+						
+						if (self.charttype == 'bar' || self.charttype == 'stackedbar' ) {
+							for(var i = 0; i < self.series.length; i++) {
+								if (tick < self.series[i].data.length && self.series[i].data[tick])
+									return self.series[i].data[tick].labelx;
+							}
 							return "";
 						}
 						else
@@ -67,7 +75,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 					show : this.charttype != 'pie' && this.showlegend
 			}	}
 			
-			if (this.series[0].isdate) {
+			if (this.isdate) {
 				//options.xaxis.mode = "time";
 				var mintick = null;
 				switch(this.dateformat) {
@@ -76,11 +84,18 @@ dojo.setObject("SimpleChart.widget.flot", {
 					case 'datetime': 
 					case 'monthday': mintick = "day";  break;
 					case 'fulldate': 
+					case 'week': 
+					case 'weekyear': 
 					case 'month': 
 					case 'yearmonth':mintick = "month";  break; 
 					case 'year':		 mintick = "year";  break;
 					default: this.showError("Unknown dateformat: " + this.dateformat);
 					}
+				if( this.isLocalizedDate ) 
+					options.xaxis.timezone = "browser";
+				else 
+					options.xaxis.timezone = null;
+				
 				options.xaxis.minTickSize = [1, mintick];
 			}
 			//set ticksize to one for category based items
@@ -101,7 +116,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 			//create seperate y axises
 			for(var i = 1; i < this.series.length; i++)	{
 				var serie = this.series[i];
-				if (serie.yaxis != "true") {
+				if (serie.seriesyaxis != true) {
 					dojo.mixin(options, { y2axis : {
 						label : this.yastitle2,
 						show : true,
@@ -159,8 +174,8 @@ dojo.setObject("SimpleChart.widget.flot", {
 							jQuery("#tooltip").remove();
 							var data = self.series[item.seriesIndex].data[item.dataIndex];
 								self.showTooltip(item.pageX, item.pageY,  
-									item.series.label + "<br/>" +
-										data.labelx +	": " + data.labely + (self.charttype == 'stack' ? " (subtotal)" : "")); 
+									( item.series.label != null ? item.series.label + "<br/>" : "") + 
+										( data.labelx != null ? data.labelx +	": " : "" )  + data.labely + (self.charttype == 'stackedbar' || self.charttype == 'stackedline' ? " (subtotal)" : "")); 
 						}
 					}
 					else {
@@ -228,11 +243,11 @@ dojo.setObject("SimpleChart.widget.flot", {
 					var y = serie.data[j].y;
 					if (this.charttype == 'pie') //pie's data is structered in another way
 						seriedata.push({ label : serie.data[j].labelx, data : y})
-					else if (this.charttype == 'bar') //give bars a small offset
+					else if (this.charttype == 'bar' ) //give bars a small offset
 						seriedata.push([serie.data[j].index + i / (this.series.length + 1) , y]); 
-					else if (this.iscategories || !this.uselinearscaling)
+					else if (this.charttype == 'stackedbar' ) 
 						seriedata.push([serie.data[j].index,y]);
-					else 
+					else  
 						seriedata.push([serie.data[j].origx,y]);
 				}
 				
@@ -240,12 +255,12 @@ dojo.setObject("SimpleChart.widget.flot", {
 					return seriedata; //for pie charts, the pie data is the data to plot. see: http://flot.googlecode.com/svn/trunk/examples/pie.html
 				
 				var data = {
-					label : serie.names,
+					label : serie.seriesnames,
 					data : seriedata,
-					yaxis : serie.yaxis == "true" ? 1 : 2
+					yaxis : serie.seriesyaxis == true ? 1 : 2
 				};
-				if (serie.color != "")
-					data.color = serie.color;
+				if (serie.seriescolor != "")
+					data.color = serie.seriescolor;
 
 				switch(this.charttype){
 					case 'pie':
@@ -254,16 +269,29 @@ dojo.setObject("SimpleChart.widget.flot", {
 					case 'bar':
 						data.bars = { show : true,  barWidth: 1 / (this.series.length + 2) };
 						break;
-					case 'line':
+					case 'line': 
 						data.lines = { show: true };
-						data.points = { show : true };
+						if( serie.seriesshowpoint == true )
+							data.points = { show : true };
+						else 
+							data.points = { show : false };
+						
 						break;
 					case 'curve':
 						this.showWarning("SimpleChart Flot implementation does not support type 'curve'. Falling back to 'line'.")
 						data.lines = { show: true };
 						break;
-					case 'stack':
-						data.lines = { show: true };
+					case 'stackedline':
+						data.lines = { show: true, fill: true };
+						data.stack = true;
+						if( serie.seriesshowpoint == true )
+							data.points = { show : true };
+						else 
+							data.points = { show : false };
+						break;
+						
+					case 'stackedbar':
+						data.bars = { show : true,  barWidth: 0.8 };
 						data.stack = true;
 						break;
 				}
@@ -280,9 +308,12 @@ dojo.setObject("SimpleChart.widget.flot", {
 		
 		this.flotNode = mendix.dom.div({ 'class' : 'SimpleChartFlotWrapperNode'});
 		mendix.dom.addClass(this.domNode, "SimpleChartFlotContainer");
+		var chartHeight = this.wheight - 50; //substract the height for the padding and the x labels
+		chartHeight -= (this.caption != "" ? 20 : 0);	//Substract the height for the graph caption
+		
 		dojo.style(this.flotNode, {
 			width : (this.wwidth - 20) + 'px',
-			height : (this.wheight - 40) + 'px'
+			height : chartHeight + 'px'
 		});
 		dojo.place(this.flotNode, this.domNode);			
 		this.drawLabels();

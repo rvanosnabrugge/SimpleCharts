@@ -374,7 +374,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 						}
 						
                         var newitem = {
-                            index : serie.data.length,
+                            index : this.iscategories ? currentx : serie.data.length,
                             origx : this.iscategories ? currentx : parseFloat(currentx),
                             labelx : labelx,
                             guid : rawdata[i][2].getGUID(),
@@ -596,8 +596,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				format = { selector : 'date', datePattern : "MMM y"};
 				break;
 			case 'weekyear': 
-				format = { selector : 'date', datePattern : "w - y"};
-				break;
+				//format = { selector : 'date', datePattern : "w - y"};
+				return this.getWeekNr(date) + ' - ' + this.getWeekYear(date);
 			case 'time': 
 				format = { selector : 'time', timePattern : "HH:mm"};
 				break;
@@ -608,6 +608,23 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		return dojo.date.locale.format(date, format);
 	},
 	
+	getWeekNr : function(date) {
+		date.setHours(0, 0, 0, 0);
+		// Thursday in current week decides the year.
+		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+		// January 4 is always in week 1.
+		var week1 = new Date(date.getFullYear(), 0, 4);
+		// Adjust to Thursday in week 1 and count number of weeks from date to week1.
+		return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+	},
+
+	// Returns the four-digit year corresponding to the ISO week of the date.
+	getWeekYear : function(date) {
+		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+		return date.getFullYear();
+	},
+
+	
 	dateRound : function(x) {
 		if (!this.isdate || this.dateaggregation == 'none')
 			return x;
@@ -616,52 +633,26 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		if( isNaN(d) )
 			return x;
 			
-
-		if( this.isLocalizedDate ) { 
-			switch(this.dateaggregation) {
-				case 'year':
-					d.setMonth(0);
-				case 'month':
-					d.setDate(1);
-				case 'day':
-					d.setHours(0)
-				case 'hour':
-					d.setMinutes(0);
-					d.setSeconds(0);
-					d.setMilliseconds(0);
-					break;
-				case 'week':
-					var distance = 1 - d.getDay();
-					d.setDate(d.getDate() + distance);
-					d.setHours(0)
-					d.setMinutes(0);
-					d.setSeconds(0);
-					d.setMilliseconds(0);
-					break;
-			}
-		}
-		else {
-			switch(this.dateaggregation) {
-				case 'year':
-					d.setUTCMonth(0);
-				case 'month':
-					d.setUTCDate(1);
-				case 'day':
-					d.setUTCHours(0)
-				case 'hour':
-					d.setUTCMinutes(0);
-					d.setUTCSeconds(0);
-					d.setUTCMilliseconds(0);
-					break;
-				case 'week':
-					var distance = 1 - d.getUTCDay();
-					d.setUTCDate(d.getUTCDate() + distance);
-					d.setUTCHours(0)
-					d.setUTCMinutes(0);
-					d.setUTCSeconds(0);
-					d.setUTCMilliseconds(0);
-					break;
-			}
+		switch(this.dateaggregation) {
+			case 'year':
+				d.setMonth(0);
+			case 'month':
+				d.setDate(1);
+			case 'day':
+				d.setHours(0)
+			case 'hour':
+				d.setMinutes(0);
+				d.setSeconds(0);
+				d.setMilliseconds(0);
+				break;
+			case 'week':
+				var distance = 1 - d.getDay();
+				d.setDate(d.getDate() + distance);
+				d.setHours(0)
+				d.setMinutes(0);
+				d.setSeconds(0);
+				d.setMilliseconds(0);
+				break;
 		}
 
 		return d.getTime();

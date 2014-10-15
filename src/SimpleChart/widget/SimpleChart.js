@@ -204,8 +204,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         var loadfunc = dojo.hitch(this, function() {
             for (var i = 0; i < this.series.length; i++) {
                 this.loadSerie(i);
-                this.waitingForVisible = false;
             }
+			this.waitingForVisible = false;
         });
         
         if (dojo.marginBox(this.domNode).h == 0) { //postpone update if hidden
@@ -364,14 +364,15 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 							labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                         }
 						
-						if( this.charttype != 'pie' ) {
-							if( this.iscategories ) {
-								var pos = jQuery.inArray( labelx, this.categoriesArray );
-								
-								if( pos < 0 ) {
-									pos = this.categoriesArray.length;
-									this.categoriesArray[pos] = labelx;
-								}
+						if( this.iscategories ) {
+							var pos = jQuery.inArray( labelx, this.categoriesArray );
+							
+							if( pos < 0 ) {
+								pos = this.categoriesArray.length;
+								this.categoriesArray[pos] = labelx;
+							}
+							
+							if( this.charttype != 'pie' ) {
 								currentx = pos;
 							}
 						}
@@ -385,8 +386,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                         };
 
                         newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.y));
-                        if (this.charttype == 'pie') //#ticket 9446, show amounts if pie
+                        if (this.charttype == 'pie') { //#ticket 9446, show amounts if pie
                             newitem.labelx += " ("  + newitem.labely + ")";
+							
+							this.categoriesArray[pos] = newitem.labelx;
+                        }
 
                         serie.data.push(newitem);
                         currenty = [];
@@ -394,10 +398,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 }
 
                 //sort
-                this.sortdata(seriesindex);
+                //this.sortdata(seriesindex);
 
-                if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
-                    this.renderSerie(seriesindex);
+                //if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
+                 //   this.renderSerie(seriesindex);
+				 
+				serie.loaded = true;
+				 
+				this.sortAndRenderSeries();
             }
             catch(e) {
                 console.error(this.id + " Error while rendering chart data " + e, e);
@@ -407,34 +415,60 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		}
 	},
 	
-	sortdata : function(seriesindex) {
-        var serie = this.series[seriesindex];
-        if (this.iscategories) {
-          var labelattr = serie.seriescategory.split("/");
-          var attrname = labelattr[labelattr.length -1];
-          var meta = mx.metadata.getMetaEntity({ 
-            className: labelattr.length == 1 ? serie.seriesentity : labelattr[1]
-          });
+	sortAndRenderSeries : function()  {
+		var allSeriesLoaded = true;
+		for( var i in this.series ) {
+			if( this.series[i].loaded != true ) {
+				allSeriesLoaded = false;
+				break;	 
+			}
+		}
 
-            //put them in a maps
-            var targetmap = {};
-            dojo.forEach(serie.data, function(item) {
-              targetmap[item.origx] = item;
-            });
-			this.categoriesArray.sort();
-            
-            //create new list
-            var result = [];
-            var i = 0;
-			for( val in targetmap) {
-				var pos = jQuery.inArray( targetmap[val].labelx, this.categoriesArray );
-				if( pos >= 0 ) {
-					result.push(targetmap[val]);
-					targetmap[val].index = pos; //update index!
+		if( allSeriesLoaded ) {
+			this.sortdata();
+
+			if (dojo.marginBox(this.domNode).h > 0) { //bugfix: do not draw if the element is hidden
+				for( var i in this.series ) {
+					this.renderSerie(i);
 				}
 			}
-            
-            serie.data = result;
+		}
+	},
+	
+	sortdata : function() {
+        if (this.iscategories) {
+			
+			this.categoriesArray.sort();
+			
+			for( var seriesindex = 0; seriesindex<this.series.length; seriesindex++ ) {
+				var serie = this.series[seriesindex];
+				var labelattr = serie.seriescategory.split("/");
+				var attrname = labelattr[labelattr.length -1];
+				var meta = mx.metadata.getMetaEntity({ 
+					className: labelattr.length == 1 ? serie.seriesentity : labelattr[1]
+				});
+
+				//put them in a maps
+				var targetmap = {};
+				dojo.forEach(serie.data, function(item) {
+				  targetmap[item.origx] = item;
+				});
+
+				//create new list
+				var result = [];
+				var i = 0;
+				for( var val in targetmap) {
+					var pos = jQuery.inArray( targetmap[val].labelx, this.categoriesArray );
+					if( pos >= 0 ) {
+						result.push(targetmap[val]);
+						targetmap[val].index = pos; //update index!
+					}
+					else 
+						console.error("Invalid configuration for chart: (" + this.id + "), unable to find " + targetmap[val].labelx + " in the categories array");
+				}
+
+				serie.data = result;
+			}
         }
     },
     
@@ -692,7 +726,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 					case "Enum":
 						var enums = "";
 						var all = true; //if all are checked, include null values
-						for(key in filter.value) {
+						for( var key in filter.value) {
 							if (filter.value[key] == true)
 								enums += "or " + filter.filterattr + "= " + (filter.type=="Enum" ? "'" + key + "'" : key) + " ";
 							else
@@ -715,7 +749,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			switch(filter.type) {
 				case "Boolean":
 				case "Enum":
-					for(key in filter.value) 
+					for( var key in filter.value) 
 						filter.value[key] = true;
 					break;
 				default:

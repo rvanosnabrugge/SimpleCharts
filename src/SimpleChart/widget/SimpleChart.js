@@ -119,6 +119,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         // Repair jquery to other version
         jQuery.noConflict();
 		
+		
+		this.categoriesArray = [];
+		
 		//create the chart
 		this.renderChart();
  
@@ -363,11 +366,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 						
 						if( this.charttype != 'pie' ) {
 							if( this.iscategories ) {
-								var pos = jQuery.inArray( currentx, this.categoriesArray );
+								var pos = jQuery.inArray( labelx, this.categoriesArray );
 								
 								if( pos < 0 ) {
 									pos = this.categoriesArray.length;
-									this.categoriesArray[pos] = currentx;
+									this.categoriesArray[pos] = labelx;
 								}
 								currentx = pos;
 							}
@@ -404,7 +407,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		}
 	},
 	
-    sortdata : function(seriesindex) {
+	sortdata : function(seriesindex) {
         var serie = this.series[seriesindex];
         if (this.iscategories) {
           var labelattr = serie.seriescategory.split("/");
@@ -412,30 +415,27 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
           var meta = mx.metadata.getMetaEntity({ 
             className: labelattr.length == 1 ? serie.seriesentity : labelattr[1]
           });
-          
-          if (meta.getAttributeClass(attrname) == 'Enum') {
-            var enums = meta.getEnumMap(attrname);
 
             //put them in a maps
             var targetmap = {};
             dojo.forEach(serie.data, function(item) {
               targetmap[item.origx] = item;
             });
+			this.categoriesArray.sort();
             
             //create new list
             var result = [];
-            var i = 0; 
-            dojo.forEach(enums, function(val) {
-              if (targetmap[val.key]) {
-                result.push(targetmap[val.key]);
-                targetmap[val.key].index = i; //update index!
-                i += 1;
-              }
-            });
+            var i = 0;
+			for( val in targetmap) {
+				var pos = jQuery.inArray( targetmap[val].labelx, this.categoriesArray );
+				if( pos >= 0 ) {
+					result.push(targetmap[val]);
+					targetmap[val].index = pos; //update index!
+				}
+			}
             
             serie.data = result;
-          }
-        }        
+        }
     },
     
 	aggregate : function(aggregate, vals) {

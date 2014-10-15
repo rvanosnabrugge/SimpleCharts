@@ -233,7 +233,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 		var res = [];
 
 		if (this.charttype == 'pie' && this.series.length > 1)
-			this.showWarning("SimpleChart Flot implementation does not support multiple series in pie charts.")
+			this.showError("SimpleChart Flot implementation does not support multiple series in pie charts.");
 
 		for(var i = 0; i < this.series.length; i++) {
 			var serie = this.series[i];
@@ -268,6 +268,8 @@ dojo.setObject("SimpleChart.widget.flot", {
 						break;
 					case 'bar':
 						data.bars = { show : true,  barWidth: 1 / (this.series.length + 2) };
+						if( this.inverted ) 
+							data.bars.horizontal = true;
 						break;
 					case 'line': 
 						data.lines = { show: true };

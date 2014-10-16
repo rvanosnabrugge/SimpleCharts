@@ -14,7 +14,8 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			case 'bar': return 'column';
 			case 'line': return 'line';
 			case 'curve': return 'spline';
-			case 'stack': return 'area';				
+			case 'stackedline': return 'area';
+			case 'stackedbar': return 'area';
 		}
 		return 'line';
 	},
@@ -43,6 +44,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			this.chart.redraw();
 		}
 		catch(e) {
+			this.showError(" Error while rendering serie " + index + ": " + e);
 			console.error(this.id + " Error while rendering serie " + index + ": " + e,e);
 		}
 	},
@@ -66,12 +68,12 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 
 		//set serie properties
 		var data = {
-			name : serie.names,
+			name : serie.seriesnames,
 			data : serie.data,
-			color: serie.color,				
+			color: serie.seriescolor,				
 			type : this.getChartTypeName(this.charttype),
 			showInLegend: this.charttype == 'pie' ? false : true,
-			yAxis : serie.yaxis == "true" ? 0 : 1
+			yAxis : serie.seriesyaxis == "true" ? 0 : 1
 		};
 				
 		//make positions for pie
@@ -100,9 +102,9 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			//create seperate y axises
 			for(var i = 1; i < this.series.length; i++)	{
 				var serie = this.series[i];
-				if (serie.yaxis != "true") { 
+				if (serie.seriesyaxis != "true") { 
 					if (yaxis.length > 1)
-						contiue;
+						continue;
 					else {
 						yaxis[1] = {
 							title : { text : this.yastitle2 },
@@ -151,7 +153,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 				tooltip: {
 					enabled : this.showhover,
 					formatter: function() {
-                        return '<b>'+ this.series.name + '</b><br/>' + this.point.labelx +': '+
+                        return '<b>'+ this.series.seriesnames + '</b><br/>' + this.point.labelx +': '+
                             (self.charttype == 'pie' ? dojo.number.round(this.percentage, 2) + '%' : this.point.labely);
                     }
 				},
@@ -181,6 +183,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 				this.objectmix(options, dojo.fromJson(this.extraoptions));
 			this.chart = new Highcharts.Chart(options);
 		} catch (e) {
+			this.showError("Unable to render the chart, because of error: " + e);
 			console.error("Error while building chart: " + e);
 			if (e.name == "SyntaxError")
 				this.showError("Please check whether the extra chart options are valid JSON");

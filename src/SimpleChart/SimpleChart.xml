@@ -48,7 +48,8 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
                 <enumerationValue key="bar">Bar</enumerationValue>
                 <enumerationValue key="line">Line</enumerationValue>
                 <enumerationValue key="curve">Curve</enumerationValue>
-                <enumerationValue key="stack">Stacked</enumerationValue>
+                <enumerationValue key="stackedline">Stacked Line</enumerationValue>
+                <enumerationValue key="stackedbar">Stacked Bar</enumerationValue>
             </enumerationValues>
         </property>
         <property key="caption" type="string" defaultValue="" required="false">
@@ -162,6 +163,10 @@ Log of the Sum: First sums, that takes the log of that value.
                 <category>Appearance</category>
                 <description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
             </property>
+            <property key="seriesshowpoint" type="boolean" defaultValue="true">
+                <caption>Show Line points </caption>
+                <category>Appearance</category> <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
+            </property>
             <property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
                 <caption>On click</caption>
                 <category>Interaction</category>
@@ -188,6 +193,7 @@ The aggregation function of the individual series is applied. Usually 'count' or
                 <enumerationValue key="none">No aggregation</enumerationValue>
                 <enumerationValue key="hour">Per hour</enumerationValue>
                 <enumerationValue key="day">Per day</enumerationValue>
+                <enumerationValue key="week">Per week</enumerationValue>
                 <enumerationValue key="month">Per month</enumerationValue>
                 <enumerationValue key="year">Per year</enumerationValue>
             </enumerationValues>
@@ -202,6 +208,7 @@ The aggregation function of the individual series is applied. Usually 'count' or
                 <enumerationValue key="day">Day only</enumerationValue>
                 <enumerationValue key="month">Month only</enumerationValue>
                 <enumerationValue key="monthday">Month and day</enumerationValue>
+                <enumerationValue key="weekyear">Week and Year</enumerationValue>
                 <enumerationValue key="year">Year only</enumerationValue>
                 <enumerationValue key="yearmonth">Year and month</enumerationValue>
                 <enumerationValue key="time">Time</enumerationValue>

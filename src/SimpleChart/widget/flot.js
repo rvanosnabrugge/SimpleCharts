@@ -267,7 +267,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 						data.pie = { show: true, autoScale: true, fillOpacity: 1 };
 						break;
 					case 'bar':
-						data.bars = { show : true,  barWidth: 1 / (this.series.length + 2) };
+						data.bars = { show : true,  barWidth: 1 / (this.series.length > 2 ? this.series.length + 2 : 2) };
 						if( this.inverted ) 
 							data.bars.horizontal = true;
 						break;

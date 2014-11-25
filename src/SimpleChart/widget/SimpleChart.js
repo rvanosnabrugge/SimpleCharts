@@ -203,6 +203,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
             
         var loadfunc = dojo.hitch(this, function() {
             for (var i = 0; i < this.series.length; i++) {
+            	this.series[i].loaded = false;
+            	this.series[i].data = null;
+            	
                 this.loadSerie(i);
             }
 			this.waitingForVisible = false;
@@ -478,7 +481,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			case 'sum' :
             case 'logsum':
 				dojo.forEach(vals, function(value) {
-					result += value;
+					if( !isNaN( value ) )
+						result += value;
 				});
                 if (aggregate == 'logsum')
                   result = Math.log(result);
@@ -490,7 +494,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				break;
 			case 'avg':
 				dojo.forEach(vals, function(value) {
-					result += value;
+					if( !isNaN( value ) )
+						result += value;
 				});				
 				break;
 			case 'min':
@@ -503,8 +508,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			case 'max':
 				result = Number.MIN_VALUE;
 				dojo.forEach(vals, function(value) {
-					if(value > result)
-						result = value;
+					if( !isNaN( value ) )
+						if(value > result)
+							result = value;
 				});								
 				break;
 			case 'none':

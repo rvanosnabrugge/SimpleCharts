@@ -3,7 +3,8 @@ dojo.require("SimpleChart.widget.lib.flot.excanvas_min");
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_min"); 
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_pie_min");
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_selection_min");
-dojo.require("SimpleChart.widget.lib.flot.jquery_flot_stack_min");
+
+dojo.require("SimpleChart.widget.lib.flot.jquery_flot_stackbars");
 
 dojo.setObject("SimpleChart.widget.flot", {
 	uninitializeChart : function() {

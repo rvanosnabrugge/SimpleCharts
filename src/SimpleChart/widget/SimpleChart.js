@@ -40,6 +40,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		seriescategory :'',
 		seriesvalues :'',
 		seriescolor :'',
+		seriesshowpoint :'',
 		seriesclick : '',
 		seriesaggregate : '',
 		xastitle : '',
@@ -70,8 +71,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	series : null,
 	usecontext : false,
 	chart : null,
+	firstrun : true,
 	isdate : false, //use dates as x axis?
+	isLocalizedDate : true, 
 	iscategories : false, //use categories as x axis
+	categoriesArray : [],
 	rangeNode : null,
 	refreshing : 0,
 
@@ -114,6 +118,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 
         // Repair jquery to other version
         jQuery.noConflict();
+		
+		
+		this.categoriesArray = [];
 		
 		//create the chart
 		this.renderChart();
@@ -197,8 +204,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         var loadfunc = dojo.hitch(this, function() {
             for (var i = 0; i < this.series.length; i++) {
                 this.loadSerie(i);
-                this.waitingForVisible = false;
             }
+			this.waitingForVisible = false;
         });
         
         if (dojo.marginBox(this.domNode).h == 0) { //postpone update if hidden
@@ -241,7 +248,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 serie.schema.references[cat[0]] = {
                   attributes : [cat[2]]
                 };
-                serie.constraint += "[" + cat[0] + "/" + cat[1] + "]";
+                serie.seriesconstraint += "[" + cat[0] + "/" + cat[1] + "]";
             }
             
             if (serie.seriesvalues) {
@@ -260,6 +267,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				xpath : "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
 				filter : serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward, 
 				callback : dojo.hitch(this, this.retrieveData, index),
+				sort : serie.seriescategory,
 				error: dojo.hitch(this, function(err) {
 					console.error("Unable to retrieve data for xpath '" + xpath + "': " + err, err);
 				})
@@ -289,9 +297,23 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 var len = objects.length;
                 for(var i = 0; i < len; i++) {
                     //check the data category type
-                    if (i == 0 && seriesindex == 0) {
-                        this.isdate = this.getMetaDataPropertyOwner(objects[i], labelattr).isDate(labelattr[labelattr.length -1]);
-                        this.iscategories = !this.isdate && !this.getMetaDataPropertyOwner(objects[i], labelattr).isNumber(labelattr[labelattr.length -1]);
+                    if (i == 0 && this.firstrun ) {
+						try {
+							var mdOwner = this.getMetaDataPropertyOwner(objects[i], labelattr);
+							if( mdOwner != null ) {
+								this.firstrun = false;
+								this.isdate = mdOwner.isDate(labelattr[labelattr.length -1]);
+								if( this.isdate )
+									this.isLocalizedDate = mdOwner.isLocalizedDate(labelattr[labelattr.length -1]);
+									
+								this.iscategories = !this.isdate && !mdOwner.isNumber(labelattr[labelattr.length -1]);
+							}
+						}
+						catch(e) {
+							this.firstrun = true;
+							this.isdate =false;
+							this.iscategories = true;
+						}
                     }
 
                     //get the x value
@@ -301,8 +323,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                     else {
                         var sub = objects[i].getChild(labelattr[0]);
                         if (sub == null || sub._guid == 0)
-                            throw "Reference to category attribute cannot be empty!";
-                        x = this.dateRound(sub.getAttribute(labelattr[2]));
+                            x = "(undefined)"
+                        else 
+							x = this.dateRound(sub.getAttribute(labelattr[2]));
                     }
 
                     //get the y value
@@ -321,7 +344,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 var currenty = [];
                 len = rawdata.length;
                 for(var i = 0; i < len; i++) {
-                    currentx = rawdata[i][0];
+                    var currentx = rawdata[i][0];
                     currenty.push(rawdata[i][1]);
 
                     if (i < len -1 && currentx === rawdata[i + 1][0] && serie.seriesaggregate != 'none')
@@ -336,12 +359,26 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                         else {
                           var sub = rawdata[i][2].getChild(labelattr[0]);
                           if (sub == null || sub._guid == 0)
-                            throw "Reference to category attribute cannot be empty!";
-                          labelx = mx.parser.formatAttribute(sub, labelattr[2]);
+                            labelx = "(undefined)"
+                          else 
+							labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                         }
-
+						
+						if( this.iscategories ) {
+							var pos = jQuery.inArray( labelx, this.categoriesArray );
+							
+							if( pos < 0 ) {
+								pos = this.categoriesArray.length;
+								this.categoriesArray[pos] = labelx;
+							}
+							
+							if( this.charttype != 'pie' ) {
+								currentx = pos;
+							}
+						}
+						
                         var newitem = {
-                            index : serie.data.length,
+                            index : this.iscategories ? currentx : serie.data.length,
                             origx : this.iscategories ? currentx : parseFloat(currentx),
                             labelx : labelx,
                             guid : rawdata[i][2].getGUID(),
@@ -349,8 +386,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                         };
 
                         newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.y));
-                        if (this.charttype == 'pie') //#ticket 9446, show amounts if pie
+                        if (this.charttype == 'pie') { //#ticket 9446, show amounts if pie
                             newitem.labelx += " ("  + newitem.labely + ")";
+							
+							this.categoriesArray[pos] = newitem.labelx;
+                        }
 
                         serie.data.push(newitem);
                         currenty = [];
@@ -358,10 +398,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 }
 
                 //sort
-                this.sortdata(seriesindex);
+                //this.sortdata(seriesindex);
 
-                if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
-                    this.renderSerie(seriesindex);
+                //if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
+                 //   this.renderSerie(seriesindex);
+				 
+				serie.loaded = true;
+				 
+				this.sortAndRenderSeries();
             }
             catch(e) {
                 console.error(this.id + " Error while rendering chart data " + e, e);
@@ -371,38 +415,61 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		}
 	},
 	
-    sortdata : function(seriesindex) {
-        var serie = this.series[seriesindex];
-        if (this.iscategories) {
-          var labelattr = serie.seriescategory.split("/");
-          var attrname = labelattr[labelattr.length -1];
-          var meta = mx.metadata.getMetaEntity({ 
-            className: labelattr.length == 1 ? serie.seriesentity : labelattr[1]
-          });
-          
-          if (meta.getAttributeClass(attrname) == 'Enum') {
-            var enums = meta.getEnumMap(attrname);
+	sortAndRenderSeries : function()  {
+		var allSeriesLoaded = true;
+		for( var i in this.series ) {
+			if( this.series[i].loaded != true ) {
+				allSeriesLoaded = false;
+				break;	 
+			}
+		}
 
-            //put them in a maps
-            var targetmap = {};
-            dojo.forEach(serie.data, function(item) {
-              targetmap[item.origx] = item;
-            });
-            
-            //create new list
-            var result = [];
-            var i = 0; 
-            dojo.forEach(enums, function(val) {
-              if (targetmap[val.key]) {
-                result.push(targetmap[val.key]);
-                targetmap[val.key].index = i; //update index!
-                i += 1;
-              }
-            });
-            
-            serie.data = result;
-          }
-        }        
+		if( allSeriesLoaded ) {
+			this.sortdata();
+
+			if (dojo.marginBox(this.domNode).h > 0) { //bugfix: do not draw if the element is hidden
+				for( var i in this.series ) {
+					this.renderSerie(i);
+				}
+			}
+		}
+	},
+	
+	sortdata : function() {
+        if (this.iscategories) {
+			
+			this.categoriesArray.sort();
+			
+			for( var seriesindex = 0; seriesindex<this.series.length; seriesindex++ ) {
+				var serie = this.series[seriesindex];
+				var labelattr = serie.seriescategory.split("/");
+				var attrname = labelattr[labelattr.length -1];
+				var meta = mx.metadata.getMetaEntity({ 
+					className: labelattr.length == 1 ? serie.seriesentity : labelattr[1]
+				});
+
+				//put them in a maps
+				var targetmap = {};
+				dojo.forEach(serie.data, function(item) {
+				  targetmap[item.origx] = item;
+				});
+
+				//create new list
+				var result = [];
+				var i = 0;
+				for( var val in targetmap) {
+					var pos = jQuery.inArray( targetmap[val].labelx, this.categoriesArray );
+					if( pos >= 0 ) {
+						result.push(targetmap[val]);
+						targetmap[val].index = pos; //update index!
+					}
+					else 
+						console.error("Invalid configuration for chart: (" + this.id + "), unable to find " + targetmap[val].labelx + " in the categories array");
+				}
+
+				serie.data = result;
+			}
+        }
     },
     
 	aggregate : function(aggregate, vals) {
@@ -456,11 +523,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	},
 	
 	clickCallback : function(serie, itemindex, clientX, clientY) {
-        if (this.series[serie].click) mx.processor.xasAction({
+        if (this.series[serie].seriesclick) mx.processor.xasAction({
 			error       : function() {
 				logger.error(this.id + "error: XAS error executing microflow");
 			},
-			actionname  : this.series[serie].click,
+			actionname  : this.series[serie].seriesclick,
 			applyto     : 'selection',
 			guids       : [this.series[serie].data[itemindex].guid]
 		});		
@@ -486,15 +553,17 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	
 	/** maps a domain X value to a label */
 	getFormattedXValue : function(value) {
-		if (!this.series[0].data)
-			return "";
 		if (this.isdate) {
 			var date = new Date(value);
-			return dojo.date.locale.format(date, this.getDateTimeFormat());
+			if( !isNaN( date ) )
+				return this.getFormattedDateTime( date );
+			
+			return "(Undefined)";
 		}
+		
 		if (this.iscategories) { //if categories, than value equals index
-			if (value < this.series[0].data.length)
-				return this.series[0].data[value].labelx;
+			if (value < this.categoriesArray.length)
+				return this.categoriesArray[value];
 			return "";
 		}
 		if (!this.uselinearscaling)
@@ -504,23 +573,30 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	
 	/** maps a plot X value to a label */
 	getXLabelForValue : function(value) {
-		if (!this.series[0].data || this.series[0].data.length == 0)
-			return "";
-		if (this.iscategories) {
-			if (value >= 0 && value < this.series[0].data.length)
-				return this.series[0].data[value].labelx; //or return categorie?
+		if (this.isdate) {
+			var date = new Date(value);
+			if( !isNaN( date ) )
+				return this.getFormattedDateTime( date );
+			
+			return "(Undefined)";
+		}
+		else if (this.iscategories) {
+			if (value < this.categoriesArray.length)
+				return this.categoriesArray[value];
 			return "";
 		}
 		else if (this.uselinearscaling && !this.iscategories)
 			return this.getFormattedXValue(value);
-		else if (value < this.series[0].data.length) {
-            
-            return this.series[0].data[
-              !isNaN(value-0) ?
-              Math.round(value) :
-              value
-            ].labelx; //value is the index for non linear data!
-            //round is required for flot to map to the closest concrete point in the data. Its a bit annoying though since the label does not match exactly. Should be a better way
+		else {
+			for(var i = 0; i < this.series.length; i++) {
+				if (value < this.series[i].data.length) 
+				return this.series[i].data[
+					  !isNaN(value-0) ?
+					  Math.round(value) :
+					  value
+					].labelx; //value is the index for non linear data!
+				//round is required for flot to map to the closest concrete point in the data. Its a bit annoying though since the label does not match exactly. Should be a better way
+			}
         }
 		return "";
 	},
@@ -530,25 +606,67 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	},
 
 	
-	getDateTimeFormat : function() {
+	getFormattedDateTime : function( date ) {
+		
+		var format = null;
 		switch(this.dateformat) {
-			case 'fulldate': return { selector : 'date', datePattern : "y-MM-dd"};
-			case 'day': return 			{ selector : 'date', datePattern : "EEE"};
-			case 'month': return 		{ selector : 'date', datePattern : "MMM"};
-			case 'monthday': return { selector : 'date', datePattern : "dd MMM"};
-			case 'year': return 		{ selector : 'date', datePattern : "y"};
-			case 'yearmonth': return{ selector : 'date', datePattern : "MMM y"};
-			case 'time': return 		{ selector : 'time', timePattern : "HH:mm"};
-			case 'datetime': return { datePattern : "y-MM-dd", timePattern : "HH:mm"};
+			case 'fulldate': 
+				return date.toLocaleDateString(); /*format = { selector : 'date', datePattern : "y-MM-dd"};*/
+			case 'datetime': 
+				return date.toLocaleDateString() + " " + dojo.date.locale.format(date, { selector : 'time', timePattern : "HH:mm"} ); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
+			case 'day': 
+				format = { selector : 'date', datePattern : "EEE"};
+				break;
+			case 'month': 
+				format = { selector : 'date', datePattern : "MMM"};
+				break;
+			case 'monthday': 
+				format = { selector : 'date', datePattern : "dd MMM"};
+				break;
+			case 'year': 
+				format = { selector : 'date', datePattern : "y"};
+				break;
+			case 'yearmonth': 
+				format = { selector : 'date', datePattern : "MMM y"};
+				break;
+			case 'weekyear': 
+				//format = { selector : 'date', datePattern : "w - y"};
+				return this.getWeekNr(date) + ' - ' + this.getWeekYear(date);
+			case 'time': 
+				format = { selector : 'time', timePattern : "HH:mm"};
+				break;
 			default: this.showError("Unknown dateformat: " + this.dateformat);
 		}
-		return null;
+		
+		
+		return dojo.date.locale.format(date, format);
 	},
+	
+	getWeekNr : function(date) {
+		date.setHours(0, 0, 0, 0);
+		// Thursday in current week decides the year.
+		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+		// January 4 is always in week 1.
+		var week1 = new Date(date.getFullYear(), 0, 4);
+		// Adjust to Thursday in week 1 and count number of weeks from date to week1.
+		return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+	},
+
+	// Returns the four-digit year corresponding to the ISO week of the date.
+	getWeekYear : function(date) {
+		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+		return date.getFullYear();
+	},
+
 	
 	dateRound : function(x) {
 		if (!this.isdate || this.dateaggregation == 'none')
 			return x;
+		
 		var d = new Date(x);
+		if( isNaN(d) )
+			return x;
+			
 		switch(this.dateaggregation) {
 			case 'year':
 				d.setMonth(0);
@@ -561,7 +679,16 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				d.setSeconds(0);
 				d.setMilliseconds(0);
 				break;
+			case 'week':
+				var distance = 1 - d.getDay();
+				d.setDate(d.getDate() + distance);
+				d.setHours(0)
+				d.setMinutes(0);
+				d.setSeconds(0);
+				d.setMilliseconds(0);
+				break;
 		}
+
 		return d.getTime();
 	},
 	
@@ -574,11 +701,11 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		for(var i = 0; i < this.filters.length; i++) {
 			var filter = this.filters[i];
 			if (filter.value && filter.value != {} && filter.value != '') {
-				if (filter.attr.indexOf("/") > -1) {
+				if (filter.filterattr.indexOf("/") > -1) {
                     for (key in filter.value)
                         if (filter.value[key] == true) {
-                            var attr = filter.attr.split("/");
-                            res += "[" + filter.attr + " = '" + this.escapeQuotes(key) + "']";
+                            var attr = filter.filterattr.split("/");
+                            res += "[" + filter.filterattr + " = '" + this.escapeQuotes(key) + "']";
                             break;
                         }
                   continue;
@@ -587,21 +714,21 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 					case "Integer":
 					case "DateTime":
 						if (filter.value.start)
-							res += "[" + filter.attr + ">="+ filter.value.start + "]";
+							res += "[" + filter.filterattr + ">="+ filter.value.start + "]";
 						if (filter.value.end)
-							res += "[" + filter.attr + "<="+ filter.value.end + "]";
+							res += "[" + filter.filterattr + "<="+ filter.value.end + "]";
 						break;
 					case "String":
 						if (dojo.isString(filter.value))
-							res += "[contains(" + filter.attr + ",'" + this.escapeQuotes(filter.value) + "')]";
+							res += "[contains(" + filter.filterattr + ",'" + this.escapeQuotes(filter.value) + "')]";
 						break;
 					case "Boolean":
 					case "Enum":
 						var enums = "";
 						var all = true; //if all are checked, include null values
-						for(key in filter.value) {
+						for( var key in filter.value) {
 							if (filter.value[key] == true)
-								enums += "or " + filter.attr + "= " + (filter.type=="Enum" ? "'" + key + "'" : key) + " ";
+								enums += "or " + filter.filterattr + "= " + (filter.type=="Enum" ? "'" + key + "'" : key) + " ";
 							else
 								all = false;
 						}
@@ -622,7 +749,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			switch(filter.type) {
 				case "Boolean":
 				case "Enum":
-					for(key in filter.value) 
+					for( var key in filter.value) 
 						filter.value[key] = true;
 					break;
 				default:
@@ -729,12 +856,12 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			for(var i = 0; i < this.inputs.length; i++)
 				dojo.addClass(this.inputs[i].domNode, "SimpleChartFilterInput");
 
-			var update = new dijit.form.Button({'class': "SimpleChartFilterUpdate", label : "update", onClick : dojo.hitch(this, function() {
+			var update = new dijit.form.Button({'class': "btn mx-button btn-default SimpleChartFilterUpdate", label : "update", onClick : dojo.hitch(this, function() {
 				this.refresh();
 				this.closeFilterBox();
 			})});
 			dojo.place(update.domNode, this.rangeNode);
-			var clear = new dijit.form.Button({'class': "SimpleChartFilterClear", label : "clear", onClick : dojo.hitch(this, this.clearConstraint)});
+			var clear = new dijit.form.Button({'class': "btn mx-button btn-default SimpleChartFilterClear", label : "clear", onClick : dojo.hitch(this, this.clearConstraint)});
 			dojo.place(clear.domNode, this.rangeNode);
 		}
 		catch(e) {
@@ -758,8 +885,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         var dataconstraint = "";
         
         for(var i = 0; i< this.series.length; i++)
-          if (this.series[i].entity == this.constraintentity)
-            dataconstraint += this.series[i].constraint; //apply constraint of the data to the selectable items.
+          if (this.series[i].seriesentity == this.constraintentity)
+            dataconstraint += this.series[i].seriesconstraint; //apply constraint of the data to the selectable items.
         
         mx.processor.get({
             xpath : ("//" + entity + "[" + ref + "/" + this.constraintentity +  dataconstraint + "]").replace(/\[\%CurrentObject\%\]/gi, this.dataobject),

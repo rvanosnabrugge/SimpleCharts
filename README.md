@@ -1,11 +1,7 @@
 The Mendix SimpleCharts widget.
 ============
 
- 
-
 The simple chart widget allows to rapidly create charts using the Modeler. The widget is designed to be easy to configure and should be up and running.
-
- 
 
 -   Multiple chart rendering algorithms
 -   Pie, Line, Curve, Stacked and Bar charts
@@ -18,31 +14,21 @@ The simple chart widget allows to rapidly create charts using the Modeler. The w
 -   Supports linear and uniform scaling along the X-axis
 -   Supports update intervals
 
- 
-
 -   NO reporting module required
 -   NO knowlegde of OQL required
 -   NO Flash required (runs on either HTML5, SVG or VML)
 
 ### Typical usage scenario
 
- 
-
--    Plot data from your domain model
-
- 
+-    Plot data from your domain model
 
 Features and limitations
 ------------------------
-
- 
 
 -   Currently data cannot be retrieved over multiple associations
 
 Properties
 ==========
-
- 
 
 Appearance
 ----------
@@ -92,7 +78,7 @@ The attribute which specifies the categorie or X value of a point in the chart. 
 
 #### Value (y)
 
-The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value. New in 2.0: ou can select values over a referenceset as well. The values will be aggregated using the selected  aggregate function.
+The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value. New in 2.0: ou can select values over a referenceset as well. The values will be aggregated using the selected  aggregate function.
 
 #### Use primary Y axis
 
@@ -132,7 +118,7 @@ Use this field to determine in which time interval data should be aggregated.
 -   etc.
 
 The aggregation function of the individual series is applied. Usually 'count' or 'sum' are the most useful options.
- Note that this options influences datetime based series only.
+ Note that this options influences datetime based series only.
 
 #### Date formatting (Full date, Day only, Month only, Month and day, Year only, Year and month, Time, Full date and time)
 
@@ -181,8 +167,6 @@ Available Filters
 
 The caption of the filter in the filter box.
 
- 
-
 #### Filter attribute
 
 The attribute to filter. The type is determined automatically to create proper input widgets. New in 2.0: You can filter on a referenced attribute as well. Only items related to actual data can be selected.
@@ -228,20 +212,12 @@ for Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step 
 Known bugs
 ==========
 
- 
-
 -   Hover labels are not shown in Internet Explorer when using Flot
--   Highcharts does not render 3 or more series correctly when using multiple Y axis. 
+-   Highcharts does not render 3 or more series correctly when using multiple Y axis. 
 
 Frequently Asked Questions
 ==========================
 
- 
-
 Ask your question at the Mendix Community [Forum](https://mxforum.mendix.com/)
 
- 
-
 -   None
-
-                    

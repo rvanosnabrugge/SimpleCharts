@@ -8,3 +8,5 @@ test/.project
 *.bak
 .idea/
 *.mws
+/src_project/
+Zip SimpleChart.bat

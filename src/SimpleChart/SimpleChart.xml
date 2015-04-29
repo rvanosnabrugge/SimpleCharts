@@ -173,6 +173,23 @@ Log of the Sum: First sums, that takes the log of that value.
                 <description>This microflow will be invoked when a specific point of this serie is clicked. If an aggregation function is used, the onclick is triggered for the first object usedin the aggregation.</description>
                 <returnType type="Void"/>
             </property>
+			        <property key="seriesextraoptions" type="string" defaultValue=""
+        required="false" multiline="true">
+            <caption>Extra options</caption>
+            <category>Appearance</category>
+            <description>
+In general, this property should be omitted. This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
+
+For Flot see: http://people.iola.dk/olau/flot/API.txt
+
+For Highcarts see: http://www.highcharts.com/ref/.
+
+Example: to use steps in the graph, and a red border around the legend specify:
+
+for Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
+
+for Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
+        </property>
           </properties>
         </property>
 

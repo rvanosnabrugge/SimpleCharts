@@ -49,7 +49,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 					show : true,
 					ticks : this.showxticks ? (this.iscategories ? null : this.wwidth / 100) : 0,
 					tickFormatter : function(tick, axis) {
-						if( self.iscategories ) {
+						if( self.iscategories && !this.isdate) {
 							if( tick >= 0 && tick < self.categoriesArray.length ) {
 								return self.categoriesArray[tick];
 							}
@@ -244,8 +244,13 @@ dojo.setObject("SimpleChart.widget.flot", {
 					var y = serie.data[j].y;
 					if (this.charttype == 'pie') //pie's data is structered in another way
 						seriedata.push({ label : serie.data[j].labelx, data : y})
-					else if (this.charttype == 'bar' ) //give bars a small offset
-						seriedata.push([serie.data[j].index + i / (this.series.length + 1) , y]); 
+					else if (this.charttype == 'bar' ) { //give bars a small offset
+						var index = serie.data[j].index;
+						if( this.isdate) 
+							index = jQuery.inArray( serie.data[j].origx, this.categoriesArray );
+						
+						seriedata.push( [index + i / (this.series.length + 1), y]); 
+					}
 					else if (this.charttype == 'stackedbar' ) 
 						seriedata.push([serie.data[j].index,y]);
 					else  
@@ -299,6 +304,8 @@ dojo.setObject("SimpleChart.widget.flot", {
 						break;
 				}
 				
+			if (serie.seriesextraoptions != '')
+				this.objectmix(data, dojo.fromJson(serie.seriesextraoptions));
 			res.push(data);
 		}
 		return res;

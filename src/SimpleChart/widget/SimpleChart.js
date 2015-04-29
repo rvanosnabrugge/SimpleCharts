@@ -43,6 +43,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		seriesshowpoint :'',
 		seriesclick : '',
 		seriesaggregate : '',
+		seriesextraoptions : '',
 		xastitle : '',
 		yastitle : '',
 		yastitle2 : '',		
@@ -200,6 +201,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
             return;
         
         this.waitingForVisible = true;
+        
+		this.categoriesArray = [];
             
         var loadfunc = dojo.hitch(this, function() {
             for (var i = 0; i < this.series.length; i++) {
@@ -355,7 +358,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                     else {
                         //calculate the label, which, can be a referred attr...
                         var labelx = "";
-                        if (!this.iscategories)
+                        if (!this.iscategories || this.isdate)
                           labelx = this.getFormattedXValue(currentx);
                         else if (labelattr.length == 1)
                           labelx = mx.parser.formatAttribute(rawdata[i][2], labelattr[0]);
@@ -367,15 +370,16 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 							labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                         }
 						
-						if( this.iscategories ) {
-							var pos = jQuery.inArray( labelx, this.categoriesArray );
+						if( this.iscategories || this.isdate ) {
+							var catValue = (this.iscategories ? labelx : parseFloat(currentx));
+							var pos = jQuery.inArray( catValue, this.categoriesArray );
 							
 							if( pos < 0 ) {
 								pos = this.categoriesArray.length;
-								this.categoriesArray[pos] = labelx;
+								this.categoriesArray[pos] = catValue;
 							}
 							
-							if( this.charttype != 'pie' ) {
+							if( this.charttype != 'pie' && !this.isdate ) {
 								currentx = pos;
 							}
 						}
@@ -472,6 +476,9 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 
 				serie.data = result;
 			}
+        }
+        else if ( this.isdate ) {
+			this.categoriesArray.sort();
         }
     },
     

@@ -15,7 +15,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			case 'line': return 'line';
 			case 'curve': return 'spline';
 			case 'stackedline': return 'area';
-			case 'stackedbar': return 'area';
+			case 'stackedbar': return 'bar';
 		}
 		return 'line';
 	},
@@ -28,7 +28,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			if (index == 0 && this.iscategories) {
 				var categories = [];
 				for(var i = 0; i < serie.data.length; i++)
-					categories.push(serie.data[i].name);
+					categories.push(serie.data[i].origx);
 				this.chart.xAxis[0].setCategories(categories, false);
 			}
 		
@@ -73,7 +73,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 			color: serie.seriescolor,				
 			type : this.getChartTypeName(this.charttype),
 			showInLegend: this.charttype == 'pie' ? false : true,
-			yAxis : serie.seriesyaxis == "true" ? 0 : 1
+			yAxis : serie.seriesyaxis == true ? 0 : 1
 		};
 				
 		//make positions for pie
@@ -159,7 +159,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 				},
 				plotOptions: {
 					series: {
-						stacking: this.charttype == 'stack' ? 'normal' : null
+						stacking: (this.charttype == 'stack' ||  this.charttype == 'stackedbar') ? 'normal' : null
 					},
 					pie: {
 						dataLabels: {

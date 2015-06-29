@@ -81,7 +81,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	refreshing : 0,
 
     splitprop : function(prop) {
-		return this[prop] != "" ? this[prop].split(";") : [""] ; 		
+		return this[prop] !== "" ? this[prop].split(";") : [""] ; 		
 	},
 	
 	postCreate : function(){
@@ -141,14 +141,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	},
 	
 	start : function() {
-		if(this.polltime > 0 && this.refreshhandle == null)
+		if(this.polltime > 0 && this.refreshhandle === null)
 			this.refreshhandle = setInterval(dojo.hitch(this, function() {
 				this.refresh();
 			}), this.polltime * 1000);
 	},
 	
 	stop : function() {
-		if (this.refreshhandle != null)
+		if (this.refreshhandle !== null)
 			clearInterval(this.refreshhandle);
         this.refreshhandle = null;
 	},
@@ -170,7 +170,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         if (this.dataobject && this.autorefresh)
             mx.processor.unSubscribeFromGUID(this, this.dataobject);
         
-        if (context && context.getTrackID() != "" && this.usecontext) {
+        if (context && context.getTrackID() !== "" && this.usecontext) {
 			this.dataobject = context.getTrackID();
 			this.hascontext = true;
             this.refresh();
@@ -214,7 +214,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			this.waitingForVisible = false;
         });
         
-        if (dojo.marginBox(this.domNode).h == 0) { //postpone update if hidden
+        if (dojo.marginBox(this.domNode).h === 0) { //postpone update if hidden
             mendix.lang.runOrDelay( 
                 loadfunc, 
                 dojo.hitch(this, function() {
@@ -240,7 +240,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		this.refreshing++;
 		var serie = this.series[index];
 
-		if (serie.schema == null) {
+		if (serie.schema === null) {
 			serie.schema = {
 				attributes : [],
                 references : {},
@@ -284,7 +284,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         if (attribute.length == 1)
             return baseObject.metaData;
         var sub = baseObject.getChild(attribute[0]);
-        if (sub == null || sub._guid == 0)
+        if (sub === null || sub._guid === 0)
             throw "Reference to category attribute cannot be empty!";
         return sub.metaData;
     },
@@ -303,10 +303,10 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 var len = objects.length;
                 for(var i = 0; i < len; i++) {
                     //check the data category type
-                    if (i == 0 && this.firstrun ) {
+                    if (i === 0 && this.firstrun ) {
 						try {
 							var mdOwner = this.getMetaDataPropertyOwner(objects[i], labelattr);
-							if( mdOwner != null ) {
+							if( mdOwner !== null ) {
 								this.firstrun = false;
 								this.isdate = mdOwner.isDate(labelattr[labelattr.length -1]);
 								if( this.isdate )
@@ -328,8 +328,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                         x = this.dateRound(objects[i].getAttribute(serie.seriescategory));
                     else {
                         var sub = objects[i].getChild(labelattr[0]);
-                        if (sub == null || sub._guid == 0)
-                            x = "(undefined)"
+                        if (sub === null || sub._guid === 0)
+                            x = "(undefined)";
                         else 
 							x = this.dateRound(sub.getAttribute(labelattr[2]));
                     }
@@ -364,8 +364,8 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                           labelx = mx.parser.formatAttribute(rawdata[i][2], labelattr[0]);
                         else {
                           var sub = rawdata[i][2].getChild(labelattr[0]);
-                          if (sub == null || sub._guid == 0)
-                            labelx = "(undefined)"
+                          if (sub === null || sub._guid === 0)
+                            labelx = "(undefined)";
                           else 
 							labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                         }
@@ -425,7 +425,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	sortAndRenderSeries : function()  {
 		var allSeriesLoaded = true;
 		for( var i in this.series ) {
-			if( this.series[i].loaded != true ) {
+			if( this.series[i].loaded !== true ) {
 				allSeriesLoaded = false;
 				break;	 
 			}
@@ -686,7 +686,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			case 'month':
 				d.setDate(1);
 			case 'day':
-				d.setHours(0)
+				d.setHours(0);
 			case 'hour':
 				d.setMinutes(0);
 				d.setSeconds(0);
@@ -695,7 +695,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			case 'week':
 				var distance = 1 - d.getDay();
 				d.setDate(d.getDate() + distance);
-				d.setHours(0)
+				d.setHours(0);
 				d.setMinutes(0);
 				d.setSeconds(0);
 				d.setMilliseconds(0);
@@ -713,10 +713,10 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 		var res = "";
 		for(var i = 0; i < this.filters.length; i++) {
 			var filter = this.filters[i];
-			if (filter.value && filter.value != {} && filter.value != '') {
+			if (filter.value && filter.value != {} && filter.value !== '') {
 				if (filter.filterattr.indexOf("/") > -1) {
-                    for (key in filter.value)
-                        if (filter.value[key] == true) {
+                    for (var key in filter.value)
+                        if (filter.value[key] === true) {
                             var attr = filter.filterattr.split("/");
                             res += "[" + filter.filterattr + " = '" + this.escapeQuotes(key) + "']";
                             break;
@@ -740,12 +740,12 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 						var enums = "";
 						var all = true; //if all are checked, include null values
 						for( var key in filter.value) {
-							if (filter.value[key] == true)
+							if (filter.value[key] === true)
 								enums += "or " + filter.filterattr + "= " + (filter.type=="Enum" ? "'" + key + "'" : key) + " ";
 							else
 								all = false;
 						}
-						if (enums!= "" && !all)
+						if (enums!== "" && !all)
 							res += "[" + enums.substring(2) + "]";
 						break;
 					default:
@@ -785,7 +785,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	},
 	
 	createrangeNode : function() {
-		if (this.constraintentity == "")
+		if (this.constraintentity === "")
 			return;
 		
 		var open = mxui.dom.create('span',{'class': "SimpleChartFilterOpen"}, "(filter)");
@@ -828,7 +828,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                   if (this.usecontext)
                     this.connect(this, 'applyContext', dojo.hitch(this, this.addReferencedFilterAttr, filter, catNode));//wait for context
                   else
-                    this.addReferencedFilterAttr(filter, catNode)
+                    this.addReferencedFilterAttr(filter, catNode);
                   continue;
                 }
 
@@ -917,7 +917,7 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         var attr = filter.filterattr.split("/")[2];
         var enums = dojo.map(objects, function(item) {
           var val = item.getAttribute(attr);
-          return { key : val, caption : val }
+          return { key : val, caption : val };
         }, this);
         this.createDropdown(catNode, filter, enums);
     },
@@ -962,14 +962,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				
 		var widget = new dijit.form.DateTextBox({});
 		widget.onChange = dojo.hitch(this, function(filter, value) {
-			filter.value.start = value == null ? null : value.getTime();
+			filter.value.start = value === null ? null : value.getTime();
 		}, filter);
 		dojo.place(widget.domNode, catNode);
 		this.inputs.push(widget);
 		
 		widget = new dijit.form.DateTextBox({});
 		widget.onChange = dojo.hitch(this, function(filter, value) {
-			filter.value.end = value == null ? null : value.getTime();
+			filter.value.end = value === null ? null : value.getTime();
 		}, filter);
 		dojo.place(widget.domNode, catNode);
 		this.inputs.push(widget);

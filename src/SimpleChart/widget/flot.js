@@ -16,14 +16,14 @@ dojo.setObject("SimpleChart.widget.flot", {
 
 	//triggered if an serie needs to be (re) rendered as a result of receiving (new) data. 
 	renderSerie : function(index) {
-		if (this.receivedseries == null)
+		if (this.receivedseries === null)
 			this.receivedseries = [];
 		this.receivedseries[index] = true;
 		
 		//if all series received:
 		var all = true;
 		for(var i = 0; i < this.series.length; i++)
-			all = all &&(this.receivedseries[i] === true)
+			all = all &&(this.receivedseries[i] === true);
 			
 		if (all) {
 			this.uninitializeChart(); //destroy current serie
@@ -74,7 +74,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 				},
 				legend : {
 					show : this.charttype != 'pie' && this.showlegend
-			}	}
+			}	};
 			
 			if (this.isdate) {
 				//options.xaxis.mode = "time";
@@ -117,7 +117,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 			//create seperate y axises
 			for(var i = 1; i < this.series.length; i++)	{
 				var serie = this.series[i];
-				if (serie.seriesyaxis != true) {
+				if (serie.seriesyaxis !== true) {
 					dojo.mixin(options, { y2axis : {
 						label : this.yastitle2,
 						show : true,
@@ -153,7 +153,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 								opacity : 0.5
 			} }	}	});	}
 				
-			if (this.extraoptions != '')
+			if (this.extraoptions !== '')
 				this.objectmix(options, dojo.fromJson(this.extraoptions));
 
 			this.chart = jQuery.plot(this.flotNode, this.getSeriesData(), options);
@@ -175,8 +175,8 @@ dojo.setObject("SimpleChart.widget.flot", {
 							jQuery("#tooltip").remove();
 							var data = self.series[item.seriesIndex].data[item.dataIndex];
 								self.showTooltip(item.pageX, item.pageY,  
-									( item.series.label != null ? item.series.label + "<br/>" : "") + 
-										( data.labelx != null ? data.labelx +	": " : "" )  + data.labely + (self.charttype == 'stackedbar' || self.charttype == 'stackedline' ? " (subtotal)" : "")); 
+									( item.series.label !== null ? item.series.label + "<br/>" : "") + 
+										( data.labelx !== null ? data.labelx +	": " : "" )  + data.labely + (self.charttype == 'stackedbar' || self.charttype == 'stackedline' ? " (subtotal)" : "")); 
 						}
 					}
 					else {
@@ -187,7 +187,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 			
 		} catch (e) {
 			console.error("Error while drawing chart: " + e);
-			if (e.name == "SyntaxError")
+			if (e.name === "SyntaxError")
 				this.showError("Please check whether the extra chart options are valid JSON");
 		}
 		return null;
@@ -195,20 +195,20 @@ dojo.setObject("SimpleChart.widget.flot", {
 	
 	drawLabels : function() {
 		//extend the draw method to draw axis labels
-		if (this.caption != "")
+		if (this.caption !== "")
 			this.drawLabel("SimpleChartCaption", this.wwidth / 2, -20, this.caption,
 				{ fontSize :'large' }, "h");
 		
 		if (this.charttype == 'pie') //skip other labels if pie
 			return;
 		
-		if (this.xastitle != "")
+		if (this.xastitle !== "")
 			this.drawLabel("SimpleChartXAxis", this.wwidth / 2, this.wheight + 12, this.xastitle, 
 				{ fontWeight : 'bold', fontStyle: 'italic' }, "h");
-		if (this.yastitle != "")
+		if (this.yastitle !== "")
 			this.drawLabel("SimpleChartYAxis", 0, -16, this.yastitle, 
 				{ fontStyle: 'italic' });
-		if (this.yastitle2 != "")
+		if (this.yastitle2 !== "")
 			this.drawLabel("SimpleChartYAxis2", this.wwidth, -16, this.yastitle2,
 				{ fontStyle: 'italic' }, "r");			
 	},
@@ -218,12 +218,12 @@ dojo.setObject("SimpleChart.widget.flot", {
 		dojo.style(span, dojo.mixin({
 			position:'absolute',
 			top: y, left : x
-		}, style == null ? {}: style));
+		}, style === null ? {}: style));
 		
 		dojo.place(span, this.domNode);
-		if (center == "h")
+		if (center === "h")
 			dojo.style(span, "left", x - dojo.style(span, 'width') / 2);
-		if (center == "r")
+		if (center === "r")
 			dojo.style(span, "left", x - dojo.style(span, 'width'));
 	},
 	
@@ -233,7 +233,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 		var self = this;
 		var res = [];
 
-		if (this.charttype == 'pie' && this.series.length > 1)
+		if (this.charttype === 'pie' && this.series.length > 1)
 			this.showError("SimpleChart Flot implementation does not support multiple series in pie charts.");
 
 		for(var i = 0; i < this.series.length; i++) {
@@ -243,7 +243,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 				for(var j = 0; j < serie.data.length; j++) {
 					var y = serie.data[j].y;
 					if (this.charttype == 'pie') //pie's data is structered in another way
-						seriedata.push({ label : serie.data[j].labelx, data : y})
+						seriedata.push({ label : serie.data[j].labelx, data : y});
 					else if (this.charttype == 'bar' ) { //give bars a small offset
 						var index = serie.data[j].index;
 						if( this.isdate) 
@@ -263,9 +263,9 @@ dojo.setObject("SimpleChart.widget.flot", {
 				var data = {
 					label : serie.seriesnames,
 					data : seriedata,
-					yaxis : serie.seriesyaxis == true ? 1 : 2
+					yaxis : serie.seriesyaxis === true ? 1 : 2
 				};
-				if (serie.seriescolor != "")
+				if (serie.seriescolor !== "")
 					data.color = serie.seriescolor;
 
 				switch(this.charttype){
@@ -279,20 +279,20 @@ dojo.setObject("SimpleChart.widget.flot", {
 						break;
 					case 'line': 
 						data.lines = { show: true };
-						if( serie.seriesshowpoint == true )
+						if( serie.seriesshowpoint === true )
 							data.points = { show : true };
 						else 
 							data.points = { show : false };
 						
 						break;
 					case 'curve':
-						this.showWarning("SimpleChart Flot implementation does not support type 'curve'. Falling back to 'line'.")
+						this.showWarning("SimpleChart Flot implementation does not support type 'curve'. Falling back to 'line'.");
 						data.lines = { show: true };
 						break;
 					case 'stackedline':
 						data.lines = { show: true, fill: true };
 						data.stack = true;
-						if( serie.seriesshowpoint == true )
+						if( serie.seriesshowpoint === true )
 							data.points = { show : true };
 						else 
 							data.points = { show : false };
@@ -304,7 +304,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 						break;
 				}
 				
-			if (serie.seriesextraoptions != '')
+			if (serie.seriesextraoptions !== '')
 				this.objectmix(data, dojo.fromJson(serie.seriesextraoptions));
 			res.push(data);
 		}
@@ -319,7 +319,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 		this.flotNode = mendix.dom.div({ 'class' : 'SimpleChartFlotWrapperNode'});
 		mendix.dom.addClass(this.domNode, "SimpleChartFlotContainer");
 		var chartHeight = this.wheight - 50; //substract the height for the padding and the x labels
-		chartHeight -= (this.caption != "" ? 20 : 0);	//Substract the height for the graph caption
+		chartHeight -= (this.caption !== "" ? 20 : 0);	//Substract the height for the graph caption
 		
 		dojo.style(this.flotNode, {
 			width : (this.wwidth - 20) + 'px',

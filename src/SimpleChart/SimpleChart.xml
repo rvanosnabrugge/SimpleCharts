@@ -17,20 +17,19 @@ IHmga6XgBujl7vw/R1TDAabZscNommOn0UeHLsNFDj2GPDBxh37DDrtJ+u8x0oFu9vb/liU6khal
 OoHZRvnqUhpROhmmxRo8cAO0M7f8187Y/F8rYxMQb/yvlbYBiNf/1wTh1HX/NUA4ZS0Ur/mvkbwa
 jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
 
-  <properties>
-        <property key="wheight" type="integer" defaultValue="300">
+    <properties>
+        <property key="wheight" type="string" defaultValue="300">
             <caption>Height</caption>
             <category>Appearance</category>
-            <description>Height of the widget in pixels. </description>
+            <description>Height of the widget (e.g. 300px or 100%).</description>
         </property>
-        <property key="wwidth" type="integer" defaultValue="300">
+        <property key="wwidth" type="string" defaultValue="100%">
             <caption>Width</caption>
             <category>Appearance</category>
-            <description>Width of the widget in pixels. </description>
+            <description>Width of the widget (e.g. 300px or 100%).</description>
         </property>
 
-        <property key="chartprovider" type="enumeration" defaultValue="flot"
-        required="true">
+        <property key="chartprovider" type="enumeration" defaultValue="flot" required="true">
             <caption>Chart implementation</caption>
             <category>Chart</category>
             <description>Chart rendering engine. Either Flot (free) or Highcharts.com (non free). The latter one supports more features but requires a license for non-commercial use. See http://www.highcharts.com/license for more details. So without a proper license one is not free to use the 'highcarts' settings. </description>
@@ -58,70 +57,73 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
             <description>Caption of the chart. </description>
         </property>
         <property key="doesnotmatter2" type="object" isList="true" required="true">
-          <caption>Chart Series</caption>
-          <category>Chart</category>
-          <description></description>
-          <properties>
-            <property key="seriesnames" type="string" defaultValue="" required="true">
-                <caption>Name</caption>
-                <category>Appearance</category>
-                <description>The label of this serie</description>
-            </property>
-            <property key="seriesentity" type="entity" required="true">
-                <caption>Entity</caption> <category>Data source</category>
-                <description>The object which represents a single point in this serie</description>
-            </property>
-            <property key="seriesconstraint" type="entityConstraint" entityProperty="seriesentity" required="false">
-              <caption>Constraint</caption>
-              <category>Data source</category>
-              <description>Constrain the objects to be shown.</description>
-            </property>
+            <caption>Chart Series</caption>
+            <category>Chart</category>
+            <description></description>
+            <properties>
+                <property key="seriesnames" type="string" defaultValue="" required="true">
+                    <caption>Name</caption>
+                    <category>Appearance</category>
+                    <description>The label of this serie</description>
+                </property>
+                <property key="seriesentity" type="entity" required="true">
+                    <caption>Entity</caption>
+                    <category>Data source</category>
+                    <description>The object which represents a single point in this serie</description>
+                </property>
+                <property key="seriesconstraint" type="entityConstraint" entityProperty="seriesentity" required="false">
+                    <caption>Constraint</caption>
+                    <category>Data source</category>
+                    <description>Constrain the objects to be shown.</description>
+                </property>
                 
-            <property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
-              <caption>Category (x)</caption> <category>Data source</category>
-              <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here.
+                <property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
+                    <caption>Category (x)</caption> <category>Data source</category>
+                    <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here.
 Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.
-              </description>
-              <attributeTypes>
-                <attributeType name="AutoNumber"/>
-                <attributeType name="Boolean"/>
-                <attributeType name="Currency"/>
-                <attributeType name="DateTime"/>
-                <attributeType name="Enum"/>
-                <attributeType name="Float"/>
-                <attributeType name="Integer"/>
-                <attributeType name="Long"/>
-                <attributeType name="String"/>
-              </attributeTypes>
-            </property>
+                    </description>
+                    <attributeTypes>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="Boolean"/>
+                        <attributeType name="Currency"/>
+                        <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
+                        <attributeType name="Float"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="String"/>
+                    </attributeTypes>
+                </property>
                       
-            <property key="seriesvalues" type="attribute" entityProperty="seriesentity" required="false" isPath="optional" pathType="referenceSet">
+                <property key="seriesvalues" type="attribute" entityProperty="seriesentity" required="false" isPath="optional" pathType="referenceSet">
                     <!-- note that pathType reference or referenceSet is
                     indifferent for the widget, however the modeler does not
                     support a 'both' property, so we use the most generic one
                     -->
-              <caption>Value (y)</caption>
-              <category>Data source</category>
-              <description>
-The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value.
-If a reference set is used, the aggregate function will be applied.
-If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case. 
-              </description>
-              <attributeTypes>
-                <attributeType name="AutoNumber"/>
-                <attributeType name="Float"/>
-                <attributeType name="Currency"/>
-                <attributeType name="Integer"/>
-                <attributeType name="Long"/>
-              </attributeTypes>
-            </property>
-            <property key="seriesyaxis" type="boolean" defaultValue="true">
-                <caption>Use primary Y axis </caption>
-                <category>Appearance</category> <description>If true, this serie uses the primary Y axis. If false, this serie uses the secondary Y axis, which has its own range. For the first serie, this value should always be true.</description>
-            </property>
-            <property key="seriesaggregate" type="enumeration" defaultValue="sum" required="true">
-                <caption>Aggregate function</caption> <category>Data source</category>
-                <description>Defines how data is aggregated when multiple Y values are available for a single X value.
+                    <caption>Value (y)</caption>
+                    <category>Data source</category>
+                    <description>
+The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value. 
+If a reference set is used, the aggregate function will be applied. 
+If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case.
+                    </description>
+                    <attributeTypes>
+                        <attributeType name="AutoNumber" />
+                        <attributeType name="Float" />
+                        <attributeType name="Currency" />
+                        <attributeType name="Integer" />
+                        <attributeType name="Long" />
+                    </attributeTypes>
+                </property>
+                <property key="seriesyaxis" type="boolean" defaultValue="true">
+                    <caption>Use primary Y axis</caption>
+                    <category>Appearance</category>
+                    <description>If true, this serie uses the primary Y axis. If false, this serie uses the secondary Y axis, which has its own range. For the first serie, this value should always be true.</description>
+                </property>
+                <property key="seriesaggregate" type="enumeration" defaultValue="sum" required="true">
+                    <caption>Aggregate function</caption>
+                    <category>Data source</category>
+                    <description>Defines how data is aggregated when multiple Y values are available for a single X value.
 
 Sum: Adds up the Y values and plot it on X.
 
@@ -139,47 +141,74 @@ to only display the 'current' state.
 Log of the Sum: First sums, that takes the Log of that value.                    
                 </description>
                 <enumerationValues>
-                  <enumerationValue key="sum">Sum</enumerationValue>
-                  <enumerationValue key="count">Count</enumerationValue>
-                  <enumerationValue key="avg">Average</enumerationValue>
-                  <enumerationValue key="max">Maximum</enumerationValue>
-                  <enumerationValue key="min">Minimum</enumerationValue>
-                  <enumerationValue key="none">Plot individual points</enumerationValue>
-                  <enumerationValue key="first">First only</enumerationValue>
-                  <enumerationValue key="last">Last only</enumerationValue>
-                  <enumerationValue key="logsum">Log of the Sum</enumerationValue>
+                    <enumerationValue key="sum">Sum</enumerationValue>
+                    <enumerationValue key="count">Count</enumerationValue>
+                    <enumerationValue key="avg">Average</enumerationValue>
+                    <enumerationValue key="max">Maximum</enumerationValue>
+                    <enumerationValue key="min">Minimum</enumerationValue>
+                    <enumerationValue key="none">Plot individual points</enumerationValue>
+                    <enumerationValue key="first">First only</enumerationValue>
+                    <enumerationValue key="last">Last only</enumerationValue>
+                    <enumerationValue key="logsum">Log of the Sum</enumerationValue>
                 </enumerationValues>
-            </property>
-            <property key="seriescolor" type="string" defaultValue="" required="false">
-                <caption>Color</caption>
-                <category>Appearance</category>
-                <description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
-            </property>
-            <property key="seriesshowpoint" type="boolean" defaultValue="false">
-                <caption>Show Line points </caption>
-                <category>Appearance</category>
-                <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
-            </property>
-            <property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
-                <caption>On click</caption>
-                <category>Interaction</category>
-                <description>This microflow will be invoked when a specific point of this serie is clicked. If an aggregation function is used, the onclick is triggered for the first object usedin the aggregation.</description>
-                <returnType type="Void"/>
-            </property>
-			        <property key="seriesextraoptions" type="string" defaultValue=""
-        required="false" multiline="true">
-            <caption>Extra options</caption>
-            <category>Appearance</category>
-            <description>
+                </property>
+                <property key="seriescolor" type="string" defaultValue="" required="false">
+                    <caption>Color</caption>
+                    <category>Appearance</category>
+                    <description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
+                </property>
+                <property key="seriesshowpoint" type="boolean" defaultValue="false">
+                    <caption>Show Line points </caption>
+                    <category>Appearance</category>
+                    <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
+                </property>
+                <property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
+                    <caption>On click</caption>
+                    <category>Interaction</category>
+                    <description>This microflow will be invoked when a specific point of this serie is clicked. If an aggregation function is used, the onclick is triggered for the first object usedin the aggregation.</description>
+                    <returnType type="Void"/>
+                </property>
+                <property key="seriesextraoptions" type="string" defaultValue="" required="false" multiline="true">
+                    <caption>Extra options</caption>
+                    <category>Appearance</category>
+                    <description>
 This property can be used to add additional options for the serie, this option is implementation specific and has only been tested with Flot.
 For Flot see: https://github.com/flot/flot/blob/master/API.md
 
 Example: to override the default chart type and show this serie as a line instead of a bar specify:
-for Flot: "{ lines: { show: true } ,bars: { show: false } } " </description>
+for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#5A4CD0","#36CAA1"] } " </description>
+                </property>
+                
+                <property key="seriesdynamicserieentity" type="entity" entityProperty="seriesentity" required="false" isPath="yes" pathType="reference">
+                    <caption>Serie Entity</caption>
+                    <category>Dynamic Series</category>
+                    <description>The object which represents a single point in this serie</description>
+                </property>
+                <property key="seriesdynamicserieattribute" type="attribute" entityProperty="seriesdynamicserieentity" required="false" isPath="optional" pathType="reference">
+                    <caption>Serie Attribute</caption>
+                    <category>Dynamic Series</category>
+                    <description>When using Dynamic Series, which entity or attribute is determining the unique nr of series. 
+                    </description>
+                    <attributeTypes>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="Boolean"/>
+                        <attributeType name="Currency"/>
+                        <attributeType name="Enum"/>
+                        <attributeType name="Float"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="String"/>
+                    </attributeTypes>
+                </property>
+                <property key="seriesdynamicserieconstraint" type="entityConstraint" entityProperty="seriesdynamicserieentity" required="false">
+                    <caption>Serie Constraint</caption>
+                    <category>Dynamic Series</category>
+                    <description>When using a Dynamic Serie if you want to limit the nr of series, add the constraint in here, even if it is the same constraint as the datapoints.</description>
+                </property>
+            </properties>
         </property>
-          </properties>
-        </property>
-
+        
+        
         <property key="xastitle" type="string" defaultValue="" required="false">
             <caption>X axis label</caption>
             <category>Chart X Axis</category>
@@ -325,8 +354,7 @@ The aggregation function of the individual series is applied. Usually 'count' or
             <category>Features</category>
             <description>If true, the chart will be re-rendered when the context object changes. </description>
         </property>
-        <property key="extraoptions" type="string" defaultValue=""
-        required="false" multiline="true">
+        <property key="extraoptions" type="string" defaultValue="" required="false" multiline="true">
             <caption>Extra options</caption>
             <category>Features</category>
             <description>

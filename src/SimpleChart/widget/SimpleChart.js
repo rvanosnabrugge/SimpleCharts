@@ -26,77 +26,93 @@ if (!dojo.getObject("widgets.widgets"))
 mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 
 	//DECLARATION
-	addons       : [mendix.addon._Contextable],
-    inputargs: { 
-		tabindex 	: 0,
-		wwidth 		: 400,
-		wheight		: 400,
-		charttype	:'pie',
-		caption		:'',
-		polltime	: 0,
-		seriesnames :'',
-		seriesentity :'',
-		seriesconstraint :'',
-		seriescategory :'',
-		seriesvalues :'',
-		seriescolor :'',
-		seriesshowpoint :'',
-		seriesclick : '',
-		seriesaggregate : '',
-		seriesextraoptions : '',
-		xastitle : '',
-		yastitle : '',
-		yastitle2 : '',		
-		seriesyaxis : '',
-		enablezoom : false,
-		inverted : false,
-		chartprovider: 'flot',
-		extraoptions : '',
-		showlegend : true,
-		showxticks : true,
-		showyticks : true,
-		showhover  : true,
-        autorefresh : false,
-		dateaggregation : 'none', // or hour/day/month/year
-		dateformat : '',
-		yunit1 : '',
-		yunit2 : '',
-		uselinearscaling : true,
-		constraintentity : '',
-		filtername : '',
-		filterattr : ''
-    },
-	
-	//IMPLEMENTATION
-	dataobject : null,
-	series : null,
-	usecontext : false,
-	chart : null,
-	firstrun : true,
-	isdate : false, //use dates as x axis?
-	isLocalizedDate : true, 
-	iscategories : false, //use categories as x axis
-	categoriesArray : [],
-	rangeNode : null,
-	refreshing : 0,
+	addons: [mendix.addon._Contextable],
+	inputargs: {
+	    tabindex: 0,
+	    wwidth: '400px',
+	    wheight: '400px',
+	    charttype: 'pie',
+	    caption: '',
+	    polltime: 0,
+	    seriesnames: '',
+	    seriesentity: '',
+	    seriesconstraint: '',
+	    seriescategory: '',
+	    seriesvalues: '',
+	    seriescolor: '',
+	    seriesshowpoint: '',
+	    seriesclick: '',
+	    seriesaggregate: '',
+	    seriesextraoptions: '',
+	    seriesdynamicserieentity: '',
+	    seriesdynamicserieattribute: '',
+	    seriesdynamicserieconstraint: '',
+	    xastitle: '',
+	    yastitle: '',
+	    yastitle2: '',
+	    seriesyaxis: '',
+	    enablezoom: false,
+	    inverted: false,
+	    chartprovider: 'flot',
+	    extraoptions: '',
+	    showlegend: true,
+	    showxticks: true,
+	    showyticks: true,
+	    showhover: true,
+	    autorefresh: false,
+	    dateaggregation: 'none', // or hour/day/month/year
+	    dateformat: '',
+	    yunit1: '',
+	    yunit2: '',
+	    uselinearscaling: true,
+	    constraintentity: '',
+	    filtername: '',
+	    filterattr: ''
+	},
+
+	 //IMPLEMENTATION
+	dataobject: null,
+	series: null,
+	serieConfigurations: null,
+	usecontext: false,
+	hasDynamicSerie: false,
+	chart: null,
+	firstrun: true,
+	isdate: false, //use dates as x axis?
+	isLocalizedDate: true,
+	iscategories: false, //use categories as x axis
+	categoriesArray: [],
+	rangeNode: null,
+	refreshing: 0,
 
     splitprop : function(prop) {
 		return this[prop] !== "" ? this[prop].split(";") : [""] ; 		
 	},
 	
 	postCreate : function(){
-		dojo.style(this.domNode, { width : this.wwidth + 'px', height : this.wheight + 'px'});
+		dojo.style(this.domNode, { width : ( this.isNumeric(this.wwidth) ? this.wwidth + 'px' : this.wwidth), height : ( this.isNumeric(this.wheight) ? this.wheight + 'px' : this.wheight)});
 		dojo.addClass(this.domNode, "SimpleChartOuter");
-
+        
 		//create series object
 		this.series = [];
-		for(var i = 0; i < this.doesnotmatter2.length; i++) {
-            var serie = this.doesnotmatter2[i];
-            if ( serie.seriesconstraint.indexOf('[%CurrentObject%]') > -1 ){
-                this.usecontext = true;
-            }
-			this.series[i] = serie;
-        }
+		this.serieConfigurations = [];
+		for (var i = 0; i < this.doesnotmatter2.length; i++) {
+		    var serie = this.doesnotmatter2[i];
+		    if (serie.seriesconstraint.indexOf('[%CurrentObject%]') > -1 || serie.seriesdynamicserieconstraint.indexOf('[%CurrentObject%]') > -1) {
+		        this.usecontext = true;
+		    }
+
+		    if (serie.seriesdynamicserieentity != '' && serie.seriesdynamicserieattribute != '') {
+		        serie.isDynamic = true;
+                serie.loaded = false;
+		        this.hasDynamicSerie = true;
+		    } else {
+		        serie.isDynamic = false;
+                serie.loaded = true;
+		        this.series[i] = serie;
+		    }
+		    this.serieConfigurations[i] = serie;
+		}
 
 		//create the filters object
 		this.filters = [];
@@ -141,14 +157,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 	},
 	
 	start : function() {
-		if(this.polltime > 0 && this.refreshhandle === null)
+		if(this.polltime > 0 && this.refreshhandle == null)
 			this.refreshhandle = setInterval(dojo.hitch(this, function() {
 				this.refresh();
 			}), this.polltime * 1000);
 	},
 	
 	stop : function() {
-		if (this.refreshhandle !== null)
+		if (this.refreshhandle != null)
 			clearInterval(this.refreshhandle);
         this.refreshhandle = null;
 	},
@@ -188,114 +204,204 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
         callback && callback();
     },
     
-	refresh : function() {
-        if (!this.isresumed || !this.hascontext)
-            return;
-          
-		if (this.refreshing > 0) {
-			console.log(this.id + " is already busy fetching new data");
-			return;
-		}
-        
-        if (this.waitingForVisible)
-            return;
-        
-        this.waitingForVisible = true;
-        
-		this.categoriesArray = [];
-            
-        var loadfunc = dojo.hitch(this, function() {
+	refresh: function () {
+	    if (!this.isresumed || !this.hascontext)
+	        return;
+
+	    if (this.refreshing > 0 || this.waitingForVisible) {
+	        console.log(this.id + " is already busy fetching new data");
+	        return;
+	    }
+	    this.waitingForVisible = true;
+	    this.categoriesArray = [];
+
+	    /*
+	     * When we are using Dynamic Series, we will load the Dynamic Series first
+	     * Once we have the Dynamic Series, the load Dynamic series process will setup all Serie Data
+	     */
+	    if (this.hasDynamicSerie) {
+	        this.loadDynamicSeries();
+	    }
+
+	    var loadfunc = dojo.hitch(this, function () {
+	        this.setupSeries();
+	    });
+
+	    mendix.lang.runOrDelay(
+	        loadfunc,
+	        dojo.hitch(this, function () {
+	                try {
+	                    var allLoaded = true;
+	                    for (var serieIndex = 0; serieIndex < this.serieConfigurations.length && allLoaded; serieIndex++) {
+	                        if (this.serieConfigurations[serieIndex].loaded !== true)
+	                            allLoaded = false;
+	                    }
+	                    return allLoaded;
+	                } catch (e) {
+	                    //we would rather like to terminate...
+	                    return false;
+	                }
+	            })
+	    );
+	},
+
+    
+    loadDynamicSeries: function () {
+        var serieIndex, serie, entityName, entityPath;
+        this.series = [];
+
+        for (serieIndex = 0; serieIndex < this.serieConfigurations.length; serieIndex++) {
+            if (this.serieConfigurations[serieIndex].isDynamic == true) {
+                serie = this.serieConfigurations[serieIndex];
+                serie.seriesdynamicserieentity.split("/");
+
+                entityPath = serie.seriesdynamicserieentity.split("/");
+                if (entityPath.length == 1) {
+                    entityName = entityPath[0];
+                } else if (entityPath.length == 2) {
+                    entityName = entityPath[1];
+                } else {
+                    console.error(this.id + " Unsupported Dynamic serie configuration for serie: " + serieIndex + " the entity path is incorrect ");
+                }
+                this.serieConfigurations[serieIndex].loaded = false;
+
+
+                //execute the get.
+                mx.processor.get({
+                    xpath: "//" + entityName + serie.seriesdynamicserieconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
+                    //filter: serie.schema, 
+                    callback: dojo.hitch(this, this.updateDynamicSerie, serieIndex),
+                    sort: serie.seriesdynamicserieattribute,
+                    async: false,
+                    error: dojo.hitch(this, function (err) {
+                        console.error("Unable to retrieve data for xpath '" + xpath + "': " + err, err);
+                    })
+                });
+            } else {
+                this.series[this.series.length] = this.serieConfigurations[serieIndex];
+            }
+        }
+    },
+
+    updateDynamicSerie: function (serieIndex, objects) {
+        try {
+            //aggregate all data to the rawdata object
+            var len = objects.length,
+                attrValue, serie, entityPath, constraint;
+            for (var i = 0; i < len; i++) {
+                serie = jQuery.extend({}, this.serieConfigurations[serieIndex]);
+
+                attrValue = objects[i].getAttribute(serie.seriesdynamicserieattribute);
+                serie.seriesnames = (attrValue === null || attrValue === '' ? '(undefined' + serieIndex + ')' : attrValue);
+
+
+                entityPath = serie.seriesdynamicserieentity.split("/");
+                if (entityPath.length == 2) {
+                    serie.seriesconstraint += '[' + entityPath[0] + '=' + objects[i]._guid + ']';
+                }
+                serie.loaded = true;
+
+                this.series[this.series.length] = serie;
+            }
+
+            this.serieConfigurations[serieIndex].loaded = true;
+        } catch (e) {
+            console.error(this.id + " Error while retrieving Dynamic Series for serie index: " + serieIndex + ", error: " + e, e);
+        }
+    },
+    
+    setupSeries: function () {
+        var loadfunc = dojo.hitch(this, function () {
             for (var i = 0; i < this.series.length; i++) {
-            	this.series[i].loaded = false;
-            	this.series[i].data = null;
-            	
+                this.series[i].loaded = false;
+                this.series[i].data = null;
+
                 this.loadSerie(i);
             }
-			this.waitingForVisible = false;
+            this.waitingForVisible = false;
         });
-        
+
         if (dojo.marginBox(this.domNode).h === 0) { //postpone update if hidden
-            mendix.lang.runOrDelay( 
-                loadfunc, 
-                dojo.hitch(this, function() {
-                	try {
-                    	return dojo.marginBox(this.domNode).h > 0;
-                    } 
-                    catch(e) {
-                    	//we would rather like to terminate...
-                    	return false;
+            mendix.lang.runOrDelay(
+                loadfunc,
+                dojo.hitch(this, function () {
+                    try {
+                        return dojo.marginBox(this.domNode).h > 0;
+                    } catch (e) {
+                        //we would rather like to terminate...
+                        return false;
                     }
                 })
             );
         } else {
             loadfunc();
         }
-	},
-	
-	loadSerie : function(index) {
+    },
 
-		if (this.usecontext && !this.dataobject)
-			return; //no context yet, abort
+    loadSerie: function (index) {
 
-		this.refreshing++;
-		var serie = this.series[index];
+        if (this.usecontext && !this.dataobject)
+            return; //no context yet, abort
 
-		if (serie.schema === null) {
-			serie.schema = {
-				attributes : [],
-                references : {},
-				sort    : [[serie.seriescategory, 'asc']]
-			};
-            
+        this.refreshing++;
+        var serie = this.series[index];
+
+        if (serie.schema == null) {
+            serie.schema = {
+                attributes: [],
+                references: {},
+                sort: [[serie.seriescategory, 'asc']]
+            };
+
             var cat = serie.seriescategory.split("/");
             if (cat.length == 1)
                 serie.schema.attributes.push(serie.seriescategory);
             else {
                 serie.schema.references[cat[0]] = {
-                  attributes : [cat[2]]
+                    attributes: [cat[2]]
                 };
                 serie.seriesconstraint += "[" + cat[0] + "/" + cat[1] + "]";
             }
-            
+
             if (serie.seriesvalues) {
-              var path = serie.seriesvalues.split("/");
-              if (path.length == 1)
-                  serie.schema.attributes.push(serie.seriesvalues);
-              else 
-                  serie.schema.references[path[0]] = {
-                      attributes : [path[2]]
-                  };
+                var path = serie.seriesvalues.split("/");
+                if (path.length == 1)
+                    serie.schema.attributes.push(serie.seriesvalues);
+                else
+                    serie.schema.references[path[0]] = {
+                        attributes: [path[2]]
+                    };
             }
-		}
-		
-		//execute the get. 
-		mx.processor.get({
-				xpath : "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
-				filter : serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward, 
-				callback : dojo.hitch(this, this.retrieveData, index),
-				sort : serie.seriescategory,
-				error: dojo.hitch(this, function(err) {
-					console.error("Unable to retrieve data for xpath '" + xpath + "': " + err, err);
-				})
-		});
-	},
+        }
+
+        //execute the get. 
+        mx.processor.get({
+            xpath: "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
+            filter: serie.schema,
+            callback: dojo.hitch(this, this.retrieveData, index),
+            sort: serie.seriescategory,
+            error: dojo.hitch(this, function (err) {
+                console.error("Unable to retrieve data for xpath '" + xpath + "': " + err, err);
+            })
+        });
+    },
     
     getMetaDataPropertyOwner : function (baseObject, attribute) {
         if (attribute.length == 1)
             return baseObject.metaData;
         var sub = baseObject.getChild(attribute[0]);
-        if (sub === null || sub._guid === 0)
+        if (sub == null || sub._guid == 0)
             throw "Reference to category attribute cannot be empty!";
         return sub.metaData;
     },
     
-	retrieveData : function(seriesindex, objects) {
+	retrieveData : function(serieIndex, objects) {
 		try {
             try {
-                var serie = this.series[seriesindex];
+                var serie = this.series[serieIndex];
                 serie.data = [];
-                valueattr = serie.seriesvalues ? serie.seriesvalues.split("/") : null;
-                labelattr = serie.seriescategory.split("/");
+                var valueattr = serie.seriesvalues ? serie.seriesvalues.split("/") : null;
+                var labelattr = serie.seriescategory.split("/");
 
                 var rawdata = []; //[[xvalue, yvalue, originalobject]]
 
@@ -405,10 +511,10 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
                 }
 
                 //sort
-                //this.sortdata(seriesindex);
+                //this.sortdata(serieIndex);
 
                 //if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
-                 //   this.renderSerie(seriesindex);
+                 //   this.renderSerie(serieIndex);
 				 
 				serie.loaded = true;
 				 
@@ -441,14 +547,23 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 			}
 		}
 	},
-	
+    
+    // mxui.widget._WidgetBase.resize is called when the page's layout is recalculated. Implement to do sizing calculations. Prefer using CSS instead.
+    resize: function (box) {
+        /* Make sure we are not waiting for visible, that means the widget is still rendering
+         * The client will trigger this function when the widget or page hasn't even showed up yet.
+         */
+    	if ( !this.waitingForVisible )
+            this.sortAndRenderSeries();
+    },
+    
 	sortdata : function() {
         if (this.iscategories) {
 			
 			this.categoriesArray.sort();
 			
-			for( var seriesindex = 0; seriesindex<this.series.length; seriesindex++ ) {
-				var serie = this.series[seriesindex];
+			for( var serieIndex = 0; serieIndex<this.series.length; serieIndex++ ) {
+				var serie = this.series[serieIndex];
 				var labelattr = serie.seriescategory.split("/");
 				var attrname = labelattr[labelattr.length -1];
 				var meta = mx.metadata.getMetaEntity({ 
@@ -962,14 +1077,14 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
 				
 		var widget = new dijit.form.DateTextBox({});
 		widget.onChange = dojo.hitch(this, function(filter, value) {
-			filter.value.start = value === null ? null : value.getTime();
+			filter.value.start = value == null ? null : value.getTime();
 		}, filter);
 		dojo.place(widget.domNode, catNode);
 		this.inputs.push(widget);
 		
 		widget = new dijit.form.DateTextBox({});
 		widget.onChange = dojo.hitch(this, function(filter, value) {
-			filter.value.end = value === null ? null : value.getTime();
+			filter.value.end = value == null ? null : value.getTime();
 		}, filter);
 		dojo.place(widget.domNode, catNode);
 		this.inputs.push(widget);
@@ -996,6 +1111,10 @@ mendix.widget.declare('SimpleChart.widget.SimpleChart', {
             return mxui.html.escapeQuotes(value);
         else
             return mx.parser.escapeQuotesInString(value);
+    },
+    
+    isNumeric : function(value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
     },
     
     objectmix : function(base, toadd) {

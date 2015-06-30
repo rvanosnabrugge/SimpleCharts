@@ -16,7 +16,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 
 	//triggered if an serie needs to be (re) rendered as a result of receiving (new) data. 
 	renderSerie : function(index) {
-		if (this.receivedseries === null)
+		if (this.receivedseries == null)
 			this.receivedseries = [];
 		this.receivedseries[index] = true;
 		
@@ -175,8 +175,8 @@ dojo.setObject("SimpleChart.widget.flot", {
 							jQuery("#tooltip").remove();
 							var data = self.series[item.seriesIndex].data[item.dataIndex];
 								self.showTooltip(item.pageX, item.pageY,  
-									( item.series.label !== null ? item.series.label + "<br/>" : "") + 
-										( data.labelx !== null ? data.labelx +	": " : "" )  + data.labely + (self.charttype == 'stackedbar' || self.charttype == 'stackedline' ? " (subtotal)" : "")); 
+									( item.series.label != null ? item.series.label + "<br/>" : "") + 
+										( data.labelx != null ? data.labelx +	": " : "" )  + data.labely + (self.charttype == 'stackedbar' || self.charttype == 'stackedline' ? " (subtotal)" : "")); 
 						}
 					}
 					else {
@@ -196,35 +196,22 @@ dojo.setObject("SimpleChart.widget.flot", {
 	drawLabels : function() {
 		//extend the draw method to draw axis labels
 		if (this.caption !== "")
-			this.drawLabel("SimpleChartCaption", this.wwidth / 2, -20, this.caption,
-				{ fontSize :'large' }, "h");
+			this.drawLabel("SimpleChartCaption", this.caption);
 		
 		if (this.charttype == 'pie') //skip other labels if pie
 			return;
 		
 		if (this.xastitle !== "")
-			this.drawLabel("SimpleChartXAxis", this.wwidth / 2, this.wheight + 12, this.xastitle, 
-				{ fontWeight : 'bold', fontStyle: 'italic' }, "h");
+			this.drawLabel("SimpleChartXAxis", this.xastitle);
 		if (this.yastitle !== "")
-			this.drawLabel("SimpleChartYAxis", 0, -16, this.yastitle, 
-				{ fontStyle: 'italic' });
+			this.drawLabel("SimpleChartYAxis", this.yastitle);
 		if (this.yastitle2 !== "")
-			this.drawLabel("SimpleChartYAxis2", this.wwidth, -16, this.yastitle2,
-				{ fontStyle: 'italic' }, "r");			
+			this.drawLabel("SimpleChartYAxis2", this.yastitle2);			
 	},
 	
-	drawLabel : function(clazz, x, y, text, style, center) {
+	drawLabel : function(clazz, text) {
 		var span = mendix.dom.span({'class' : 'tickLabel SimpleChartFlotTickLabel ' + clazz}, text);
-		dojo.style(span, dojo.mixin({
-			position:'absolute',
-			top: y, left : x
-		}, style === null ? {}: style));
-		
 		dojo.place(span, this.domNode);
-		if (center === "h")
-			dojo.style(span, "left", x - dojo.style(span, 'width') / 2);
-		if (center === "r")
-			dojo.style(span, "left", x - dojo.style(span, 'width'));
 	},
 	
 
@@ -318,13 +305,7 @@ dojo.setObject("SimpleChart.widget.flot", {
 		
 		this.flotNode = mendix.dom.div({ 'class' : 'SimpleChartFlotWrapperNode'});
 		mendix.dom.addClass(this.domNode, "SimpleChartFlotContainer");
-		var chartHeight = this.wheight - 50; //substract the height for the padding and the x labels
-		chartHeight -= (this.caption !== "" ? 20 : 0);	//Substract the height for the graph caption
-		
-		dojo.style(this.flotNode, {
-			width : (this.wwidth - 20) + 'px',
-			height : chartHeight + 'px'
-		});
+        
 		dojo.place(this.flotNode, this.domNode);			
 		this.drawLabels();
 		dojo.html.set(this.flotNode, 'Loading chart..');

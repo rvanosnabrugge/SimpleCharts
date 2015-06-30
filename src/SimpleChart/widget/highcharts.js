@@ -52,7 +52,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 	//helper function to constructie a series data array for highcharts
 	getSeriesData : function(index) {
 		var self = this;
-		var size = this.wwidth / this.series.length; //size if multiple pie's are used
+        var size = Math.round( 100 / this.series.length );
 		var serie = this.series[index];
 			
 		//add a click event for each point
@@ -69,17 +69,19 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 		//set serie properties
 		var data = {
 			name : serie.seriesnames,
-			data : serie.data,
-			color: serie.seriescolor,				
+			data : serie.data,				
 			type : this.getChartTypeName(this.charttype),
 			showInLegend: this.charttype == 'pie' ? false : true,
+            color: null,
 			yAxis : serie.seriesyaxis == true ? 0 : 1
 		};
+        if( serie.seriescolor != null && serie.seriescolor != '' ) 
+			data.color = serie.seriescolor;
 				
 		//make positions for pie
 		if (this.series.length > 1 && this.charttype == 'pie') {
-			data['center'] = [size * index, Math.round(this.wheight / 2) - 20];
-			data['size'] =  Math.round(this.wwidth / this.series.length) - 20;
+			data.center = [ ((size * index) + (size/2)) + '%', '50%'  ]; //[size * index, Math.round(this.wheight / 2) - 20];
+			data.size =  size + '%';
 		}
 		return data;
 	},
@@ -116,7 +118,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 									return self.showyticks ? this.value + " " + self.yunit2 : "";
 								}
 							}
-						}
+						};
 					}
 				}
 			}
@@ -153,7 +155,7 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 				tooltip: {
 					enabled : this.showhover,
 					formatter: function() {
-                        return '<b>'+ this.series.seriesnames + '</b><br/>' + this.point.labelx +': '+
+                        return '<b>'+ this.series.name + '</b><br/>' + this.point.labelx +': '+
                             (self.charttype == 'pie' ? dojo.number.round(this.percentage, 2) + '%' : this.point.labely);
                     }
 				},
@@ -164,12 +166,15 @@ dojo.setObject("SimpleChart.widget.highcharts", {
 					pie: {
 						dataLabels: {
 							enabled: true,
+                            //Indicates how far the labels will be placed from the Pie chart
+                            distance: 10,
 							formatter: function() {
 								if (this.percentage > 5)
 									return this.point.labelx + "<br/>(" + dojo.number.round(this.point.percentage,0) + "%)";
 								return "";
 							},
-							color: 'white'
+							color: '#FFF',
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)'
 						}
 					}
 				},

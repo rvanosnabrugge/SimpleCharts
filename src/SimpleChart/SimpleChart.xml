@@ -79,7 +79,8 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
                 
             <property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
               <caption>Category (x)</caption> <category>Data source</category>
-              <description>The attribute which specifies the categorie or X value of a point in the chart. Note that all series should use a Category attribute which returns comparable values from the same domain, otherwise the X-axis might contain undesired values. References are allowed here.
+              <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here.
+Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.
               </description>
               <attributeTypes>
                 <attributeType name="AutoNumber"/>
@@ -102,11 +103,9 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
               <caption>Value (y)</caption>
               <category>Data source</category>
               <description>
-The attribute which specifies the (Y) value of a point in the chart.
-Should be a numeric value.
+The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value.
 If a reference set is used, the aggregate function will be applied.
-If not defined, value '1' will be used. Note that an aggregate function is strongly advised in that case. 
-              
+If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case. 
               </description>
               <attributeTypes>
                 <attributeType name="AutoNumber"/>
@@ -122,29 +121,22 @@ If not defined, value '1' will be used. Note that an aggregate function is stron
             </property>
             <property key="seriesaggregate" type="enumeration" defaultValue="sum" required="true">
                 <caption>Aggregate function</caption> <category>Data source</category>
-                <description>Defines how data is
-aggregated when multiple Y values are available for a single
-X value.
+                <description>Defines how data is aggregated when multiple Y values are available for a single X value.
 
 Sum: Adds up the Y values and plot it on X.
 
-Count: counts the number of Y values available for a single
-point. Note that this ignores the actual Y value, so it does
-not really matter which Y value is set.
+Count: counts the number of Y values available for a single point. This ignores the Y value, it does not matter if an Y value is selected.
 
-Avg/Max/Min: Takes the average/maximum/minimum of the
-availble Y values.
+Avg/Max/Min: Takes the average/maximum/minimum of the availble Y values.
 
-Plot individual points: For each Y value a seperate 'column'
-appears.
+Plot individual points: For each Y value a seperate 'column' appears.
 
-First only: Only take the first value available, ignore the
-others.
+First only: Only take the first value available, ignore the others.
 
 Last only: Only take the last value available, ignore the others. Usefull
 to only display the 'current' state.
 
-Log of the Sum: First sums, that takes the log of that value.                    
+Log of the Sum: First sums, that takes the Log of that value.                    
                 </description>
                 <enumerationValues>
                   <enumerationValue key="sum">Sum</enumerationValue>
@@ -163,9 +155,10 @@ Log of the Sum: First sums, that takes the log of that value.
                 <category>Appearance</category>
                 <description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
             </property>
-            <property key="seriesshowpoint" type="boolean" defaultValue="true">
+            <property key="seriesshowpoint" type="boolean" defaultValue="false">
                 <caption>Show Line points </caption>
-                <category>Appearance</category> <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
+                <category>Appearance</category>
+                <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
             </property>
             <property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
                 <caption>On click</caption>
@@ -178,17 +171,11 @@ Log of the Sum: First sums, that takes the log of that value.
             <caption>Extra options</caption>
             <category>Appearance</category>
             <description>
-In general, this property should be omitted. This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
+This property can be used to add additional options for the serie, this option is implementation specific and has only been tested with Flot.
+For Flot see: https://github.com/flot/flot/blob/master/API.md
 
-For Flot see: http://people.iola.dk/olau/flot/API.txt
-
-For Highcarts see: http://www.highcharts.com/ref/.
-
-Example: to use steps in the graph, and a red border around the legend specify:
-
-for Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
-
-for Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
+Example: to override the default chart type and show this serie as a line instead of a bar specify:
+for Flot: "{ lines: { show: true } ,bars: { show: false } } " </description>
         </property>
           </properties>
         </property>
@@ -307,7 +294,6 @@ The aggregation function of the individual series is applied. Usually 'count' or
         </property>
 
 
-
         <property key="showlegend" type="boolean" defaultValue="true">
             <caption>Show legend</caption>
             <category>Features</category>
@@ -344,17 +330,14 @@ The aggregation function of the individual series is applied. Usually 'count' or
             <caption>Extra options</caption>
             <category>Features</category>
             <description>
-In general, this property should be omitted. This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
-
-For Flot see: http://people.iola.dk/olau/flot/API.txt
-
+This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
+For Flot see: https://github.com/flot/flot/blob/master/API.md
 For Highcarts see: http://www.highcharts.com/ref/.
 
 Example: to use steps in the graph, and a red border around the legend specify:
 
-for Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
-
-for Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
+Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
+Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
         </property>
   </properties>
 </widget>

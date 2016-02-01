@@ -27,7 +27,7 @@ require({
 }, ['dojo/_base/declare', 'mxui/widget/_WidgetBase',
     'jquery', 'SimpleChart/widget/flot', 'SimpleChart/widget/highcharts',
     'dijit/form/DateTextBox', 'dijit/form/NumberTextBox' , 'dijit/form/TextBox', 'dijit/form/CheckBox', 'dijit/form/Button'
-    
+
 ], function(declare, _WidgetBase, jQuery, flot, highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
     'use strict';
 
@@ -94,7 +94,7 @@ require({
 
         postCreate: function() {
             mxui.dom.addCss(require.toUrl("SimpleChart/widget/ui/SimpleChart250.css"));
-            
+
             dojo.style(this.domNode, {
                 width: this.wwidth + 'px',
                 height: this.wheight + 'px'
@@ -116,7 +116,7 @@ require({
             for (var i = 0; i < this.stilldoesntmatter.length; i++) {
                 this.filters[i] = this.stilldoesntmatter[i];
             }
-           
+
             //mix chart implementations in as kind of addon, but lazy loaded..
             if (this.chartprovider === 'flot') {
                 var chart = new flot();
@@ -168,6 +168,10 @@ require({
             this.start();
             this.isresumed = true;
             this.refresh();
+        },
+
+        resize: function () {
+            
         },
 
         applyContext: function(context, callback) {
@@ -273,11 +277,11 @@ require({
                 }
             }
 
-            //execute the get. 
-            
+            //execute the get.
+
             mx.data.get({
                 xpath: "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
-                filter: serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward, 
+                filter: serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward,
                 callback: dojo.hitch(this, this.retrieveData, index),
                 //sort: serie.seriescategory,
                 error: dojo.hitch(this, function(err) {
@@ -298,10 +302,10 @@ require({
         retrieveData: function(seriesindex, objects) {
             try {
                 try {
-                    var serie = this.series[seriesindex],                    
+                    var serie = this.series[seriesindex],
                     valueattr = serie.seriesvalues ? serie.seriesvalues.split("/") : null,
                     labelattr = serie.seriescategory.split("/");
-                    
+
                     serie.data = [];
                     var rawdata = []; //[[xvalue, yvalue, originalobject]]
 
@@ -821,9 +825,9 @@ require({
             dojo.place(n, this.domNode);
 
             //retrieve the type and then construct the inputs
-            
+
             this.addFilterInputs(mx.meta.getEntity( this.constraintentity));
-            
+
         },
 
         inputs: null,
@@ -857,7 +861,7 @@ require({
 
                     dojo.place(mxui.dom.create('span', {
                         'class': "SimpleChartFilterLabel"
-                    }, filter.filtername), catNode);                    
+                    }, filter.filtername), catNode);
                     filter.type = meta.getAttributeType(filter.filterattr);
 
                     if (meta.isDate(filter.filterattr))

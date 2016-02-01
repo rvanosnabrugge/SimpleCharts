@@ -1,4 +1,4 @@
-dojo.require("SimpleChart.widget.lib.flot.excanvas_min");
+dojo.require("SimpleChart.widget.lib.flot.excanvas");
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_min");
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_pie_min");
 dojo.require("SimpleChart.widget.lib.flot.jquery_flot_selection_min");
@@ -16,7 +16,7 @@ define(["dojo/_base/declare"],
 
             receivedseries: null,
 
-            //triggered if an serie needs to be (re) rendered as a result of receiving (new) data. 
+            //triggered if an serie needs to be (re) rendered as a result of receiving (new) data.
             renderSerie: function(index) {
                 if (this.receivedseries == null)
                     this.receivedseries = [];
@@ -37,7 +37,7 @@ define(["dojo/_base/declare"],
                 try {
                     var self = this;
 
-                    //options					
+                    //options
                     var options = {
                         title: this.caption,
                         grid: {

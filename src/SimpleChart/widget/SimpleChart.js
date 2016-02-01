@@ -24,15 +24,15 @@ require({
         location: '../../widgets/SimpleChart/widget/lib/flot',
         main: 'jquery.min'
     }]
-}, ['dojo/_base/declare', 'mxui/widget/_WidgetBase',
+}, ['dojo/_base/declare', 'mxui/widget/_WidgetBase', 'mxui/mixin/_Contextable',
     'jquery', 'SimpleChart/widget/flot', 'SimpleChart/widget/highcharts',
     'dijit/form/DateTextBox', 'dijit/form/NumberTextBox' , 'dijit/form/TextBox', 'dijit/form/CheckBox', 'dijit/form/Button'
 
-], function(declare, _WidgetBase, jQuery, flot, highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
+], function(declare, _WidgetBase, _Contextable, jQuery, flot, highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
     'use strict';
 
     // Declare widget's prototype.
-    return declare('SimpleChart.widget.SimpleChart', [_WidgetBase, mendix.addon._Contextable], {
+    return declare('SimpleChart.widget.SimpleChart', [_WidgetBase, _Contextable], {
 
         //DECLARATION
         inputargs: {
@@ -171,7 +171,7 @@ require({
         },
 
         resize: function () {
-            
+
         },
 
         applyContext: function(context, callback) {

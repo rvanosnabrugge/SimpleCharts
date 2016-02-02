@@ -40,15 +40,17 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
         </property>
         <property key="charttype" type="enumeration" defaultValue="line" required="true">
             <caption>Chart type</caption> <category>Chart</category>
-            <description> Which kind of chart to display. Stacked is a line based graph, which sums up all series. Curve generates a smooth graph and is only supported by the Highcharts implementation.
-            </description>
+            <description>Check http://api.highcharts.com/highcharts#plotOptions for explanation.</description>
             <enumerationValues>
                 <enumerationValue key="pie">Pie</enumerationValue>
+        				<enumerationValue key="column">Column</enumerationValue>
                 <enumerationValue key="bar">Bar</enumerationValue>
+        				<enumerationValue key="area">Area</enumerationValue>
                 <enumerationValue key="line">Line</enumerationValue>
                 <enumerationValue key="curve">Curve</enumerationValue>
                 <enumerationValue key="stackedline">Stacked Line</enumerationValue>
                 <enumerationValue key="stackedbar">Stacked Bar</enumerationValue>
+        				<enumerationValue key="other">Other or combinations (define type in chart series)</enumerationValue>
             </enumerationValues>
         </property>
         <property key="caption" type="string" defaultValue="" required="false">
@@ -76,12 +78,11 @@ jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
                     <category>Data source</category>
                     <description>Constrain the objects to be shown.</description>
                 </property>
-                
+
                 <property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
-                    <caption>Category (x)</caption> <category>Data source</category>
-                    <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here.
-Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.
-                    </description>
+                    <caption>Category (x)</caption>
+                    <category>Data source</category>
+                    <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here. Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.</description>
                     <attributeTypes>
                         <attributeType name="AutoNumber"/>
                         <attributeType name="Boolean"/>
@@ -89,12 +90,67 @@ Note that all series should use a Category that correlate with eachother. Otherw
                         <attributeType name="DateTime"/>
                         <attributeType name="Enum"/>
                         <attributeType name="Float"/>
+                        <attributeType name="Decimal"/>
                         <attributeType name="Integer"/>
                         <attributeType name="Long"/>
                         <attributeType name="String"/>
                     </attributeTypes>
                 </property>
-                      
+                <property key="seriescharttype" type="enumeration" defaultValue="spline" required="true">
+                  <caption>Serie type</caption> <category>Appearance</category>
+                  <description> Check http://api.highcharts.com/highcharts#series.type for descriptions on the serie types
+                  </description>
+                  <enumerationValues>
+                    <enumerationValue key="area">Area</enumerationValue>
+                    <enumerationValue key="areaspline">Areaspline</enumerationValue>
+                    <enumerationValue key="bar">Bar</enumerationValue>
+                    <enumerationValue key="column">Column</enumerationValue>
+                    <enumerationValue key="line">Line</enumerationValue>
+                    <enumerationValue key="pie">Pie</enumerationValue>
+                    <enumerationValue key="gauge">Gauge</enumerationValue>
+                    <enumerationValue key="scatter">Scatter</enumerationValue>
+                    <enumerationValue key="spline">Spline</enumerationValue>
+                    <enumerationValue key="funnel">Funnel</enumerationValue>
+                    <enumerationValue key="bubble">Bubble</enumerationValue>
+                  </enumerationValues>
+                </property>
+                <property key="dashStyle" type="string" defaultValue="solid">
+                  <caption>Dash style</caption>
+                  <category>Appearance</category>
+                  <description>A name for the dash style to use for the graph. Applies only to series type having a graph, like line, spline, area and scatter in case it has a lineWidth. </description>
+                </property>
+                <property key="step" type="boolean" defaultValue="false">
+                  <caption>Step</caption>
+                  <category>Appearance</category>
+                  <description>Whether to apply steps to the line. Possible values are left, center and right. Prior to 2.3.5, only left was supported. Defaults to false. </description>
+                </property>
+
+                <property key="AddSuffix" type="boolean" defaultValue="false">
+                  <caption>Add suffix</caption>
+                  <category>Conditionals</category>
+                  <description>Whether to add the suffix (c) of (i) to the tooltip</description>
+                </property>
+
+
+                <property key="seriesstack" type="integer" defaultValue="1" required="true">
+                  <caption>Stack</caption>
+                  <category>Appearance</category>
+                  <description>This option allows grouping series in a stacked chart. The stack option can be a string or a number or anything else, as long as the grouped series' stack options match each other.</description>
+                      </property>
+
+                <property key="markerradius" type="integer" defaultValue="3" required="true">
+                  <caption>Marker radius</caption>
+                  <category>Appearance</category>
+                  <description>This option allows to set de radius of the marker (in px).</description>
+                      </property>
+
+
+                <property key="markersymbol" type="string" defaultValue="circle" required="true">
+                  <caption>Marker symbol</caption>
+                  <category>Appearance</category>
+                  <description>This option allows to set de symbol of the marker. Possible options are: "circle", "square", "diamond", "triangle" and "triangle-down". Another option is to add url(https://www.highcharts.com/samples/graphics/sun.png) with any url you want. </description>
+                      </property>
+
                 <property key="seriesvalues" type="attribute" entityProperty="seriesentity" required="false" isPath="optional" pathType="referenceSet">
                     <!-- note that pathType reference or referenceSet is
                     indifferent for the widget, however the modeler does not
@@ -102,14 +158,11 @@ Note that all series should use a Category that correlate with eachother. Otherw
                     -->
                     <caption>Value (y)</caption>
                     <category>Data source</category>
-                    <description>
-The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value. 
-If a reference set is used, the aggregate function will be applied. 
-If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case.
-                    </description>
+                    <description>If a reference set is used, the aggregate function will be applied. If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case.</description>
                     <attributeTypes>
                         <attributeType name="AutoNumber" />
                         <attributeType name="Float" />
+        				        <attributeType name="Decimal"/>
                         <attributeType name="Currency" />
                         <attributeType name="Integer" />
                         <attributeType name="Long" />
@@ -138,7 +191,7 @@ First only: Only take the first value available, ignore the others.
 Last only: Only take the last value available, ignore the others. Usefull
 to only display the 'current' state.
 
-Log of the Sum: First sums, that takes the Log of that value.                    
+Log of the Sum: First sums, that takes the Log of that value.
                 </description>
                 <enumerationValues>
                     <enumerationValue key="sum">Sum</enumerationValue>
@@ -178,7 +231,7 @@ For Flot see: https://github.com/flot/flot/blob/master/API.md
 Example: to override the default chart type and show this serie as a line instead of a bar specify:
 for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#5A4CD0","#36CAA1"] } " </description>
                 </property>
-                
+
                 <property key="seriesdynamicserieentity" type="entity" entityProperty="seriesentity" required="false" isPath="yes" pathType="reference">
                     <caption>Serie Entity</caption>
                     <category>Dynamic Series</category>
@@ -187,7 +240,7 @@ for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#
                 <property key="seriesdynamicserieattribute" type="attribute" entityProperty="seriesdynamicserieentity" required="false" isPath="optional" pathType="reference">
                     <caption>Serie Attribute</caption>
                     <category>Dynamic Series</category>
-                    <description>When using Dynamic Series, which entity or attribute is determining the unique nr of series. 
+                    <description>When using Dynamic Series, which entity or attribute is determining the unique nr of series.
                     </description>
                     <attributeTypes>
                         <attributeType name="AutoNumber"/>
@@ -207,8 +260,6 @@ for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#
                 </property>
             </properties>
         </property>
-        
-        
         <property key="xastitle" type="string" defaultValue="" required="false">
             <caption>X axis label</caption>
             <category>Chart X Axis</category>
@@ -232,10 +283,23 @@ The aggregation function of the individual series is applied. Usually 'count' or
             </enumerationValues>
         </property>
         <property key="dateformat" type="enumeration" defaultValue="fulldate" required="true">
+            <caption>Date formatting tooltip</caption> <category>Chart X Axis</category>
+            <description>The date format which should be used if applicable for tooltip.</description>
+            <enumerationValues>
+                <enumerationValue key="fulldate">Full date</enumerationValue>
+                <enumerationValue key="day">Day only</enumerationValue>
+                <enumerationValue key="month">Month only</enumerationValue>
+                <enumerationValue key="monthday">Month and day</enumerationValue>
+                <enumerationValue key="weekyear">Week and Year</enumerationValue>
+                <enumerationValue key="year">Year only</enumerationValue>
+                <enumerationValue key="yearmonth">Year and month</enumerationValue>
+                <enumerationValue key="time">Time</enumerationValue>
+                <enumerationValue key="datetime">Full date and time</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="dateformatXaxis" type="enumeration" defaultValue="fulldate" required="true">
             <caption>Date formatting</caption> <category>Chart X Axis</category>
-            <description>
-                The date format which should be used if applicable.
-            </description>
+            <description>The date format which should be used if applicable.</description>
             <enumerationValues>
                 <enumerationValue key="fulldate">Full date</enumerationValue>
                 <enumerationValue key="day">Day only</enumerationValue>
@@ -314,6 +378,7 @@ The aggregation function of the individual series is applied. Usually 'count' or
                       <attributeType name="DateTime"/>
                       <attributeType name="Enum"/>
                       <attributeType name="Float"/>
+                      <attributeType name="Decimal"/>
                       <attributeType name="Integer"/>
                       <attributeType name="Long"/>
                       <attributeType name="String"/>
@@ -339,6 +404,16 @@ The aggregation function of the individual series is applied. Usually 'count' or
             <category>Features</category>
             <description>Whether the user can zoom in on a subset of the data. Highcharts only. </description>
         </property>
+        <property key="sharedtooltip" type="boolean" defaultValue="false">
+                <caption>Shared tooltip</caption>
+                <category>Features</category>
+                <description>Whether to display the values in a shared tooltip. </description>
+            </property>
+         <property key="showcrosshairs" type="boolean" defaultValue="true">
+                <caption>Show crosshairs</caption>
+                <category>Features</category>
+                <description></description>
+            </property>
         <property key="inverted" type="boolean" defaultValue="false">
             <caption>Swap axes</caption>
             <category>Features</category>
@@ -349,6 +424,10 @@ The aggregation function of the individual series is applied. Usually 'count' or
             <category>Features</category>
             <description>Refresh time in seconds.</description>
         </property>
+        <property key="listentogrid" type="boolean" defaultValue="false">
+                    <caption>Listen to grid </caption>
+                    <category>Features</category> <description>If true, the series will be updated based on the listen-to-grid selection.</description>
+                </property>
         <property key="autorefresh" type="boolean" defaultValue="false">
             <caption>Auto refresh</caption>
             <category>Features</category>
@@ -367,6 +446,78 @@ Example: to use steps in the graph, and a red border around the legend specify:
 Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
 Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
         </property>
+
+        <property key="enablePlotbands" type="boolean" defaultValue="false">
+          <caption>Enable Plotbands</caption>
+          <category>Plotband</category>
+          <description>This will enable the possibility to plot colored plotbands on the y-axis.</description>
+        </property>
+        <property key="plotBandEntity" type="entity" required="false">
+          <caption>Plotband entity </caption>
+          <category>Plotband</category>
+          <description>The entity that holds the plotband information</description>
+        </property>
+
+
+        <property key="highRedEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+          <caption>Max</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the maximum red value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                          <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
+        <property key="highRedBegin" type="attribute" entityProperty="plotBandEntity"  required="false">
+          <caption>High-high</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the minimum red value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                          <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
+        <property key="greenEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+          <caption>High</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the maximum green value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                          <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
+        <property key="greenBegin" type="attribute" entityProperty="plotBandEntity"  required="false">
+          <caption>Low</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the minimum green value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                          <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
+        <property key="lowRedEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+          <caption>Low-low</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the maximum red value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
+        <property key="lowRedBegin" type="attribute" entityProperty="plotBandEntity"  required="false">
+          <caption>Min</caption>
+          <category>Plotband</category>
+          <description>The attribute that specifies the minimum red value</description>
+            <attributeTypes>
+                          <attributeType name="Float"/>
+                          <attributeType name="Decimal"/>
+                          <attributeType name="Integer"/>
+            </attributeTypes>
+        </property>
   </properties>
 </widget>
-

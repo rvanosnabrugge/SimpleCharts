@@ -1,5 +1,8 @@
 /*global Highcharts*/
+//dojo.provide("SimpleChart.widget.highcharts");
 dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src"); //or _src
+dojo.require("SimpleChart.widget.lib.highcharts.highcharts-more");
+dojo.require("SimpleChart.widget.lib.highcharts.highcharts-3d"); 
 
 define(["dojo/_base/declare"],
     function(declare) {
@@ -54,7 +57,52 @@ define(["dojo/_base/declare"],
                         this.chart.addSeries(data, false);
 
                     this.chart.redraw();
-                } catch (e) {
+
+
+
+                if (this.enablePlotbands){
+          				// 20150915 Ivo Sturm - Added plotbands settings
+          				if (this.greenColor !== ""){
+
+          					var plotBandOpts = [];
+
+          					var plotBandOpts = [
+          						{
+          							from: this.objects[0].lowRedBegin,
+          							to: this.objects[0].lowRedEnd,
+          							color: this.red
+          						}, {
+          							from: this.objects[0].lowRedEnd,
+          							to: this.objects[0].greenBegin,
+          							color: this.orange
+          						}, {
+          							from: this.objects[0].greenBegin,
+          							to: this.objects[0].greenEnd,
+          							color: this.green
+          						}, {
+          							from: this.objects[0].greenEnd,
+          							to: this.objects[0].highRedBegin,
+          							color: this.orange
+          						}, {
+          							from: this.objects[0].highRedBegin,
+          							to: this.objects[0].highRedEnd,
+          							color: this.red
+          					}];
+
+          					var axisOptions = {plotBands: plotBandOpts};
+          					this.chart.yAxis[0].update(axisOptions);
+
+          					//this.chart.yAxis[0].options.plotBands = plotBandOpts;
+
+          				}
+          			}
+          			this.chart.redraw();
+          		}
+
+
+
+
+              catch (e) {
                     this.showError(" Error while rendering serie " + index + ": " + e);
                     console.error(this.id + " Error while rendering serie " + index + ": " + e, e);
                 }
@@ -108,7 +156,14 @@ define(["dojo/_base/declare"],
                         },
                         labels: {
                             formatter: function() {
-                                return self.showyticks ? this.value + " " + self.yunit1 : "";
+                                //return self.showyticks ? this.value + " " + self.yunit1 : "";
+
+
+
+                                // 2015-08-09 - Wouter van Stralen: formatter aangepast om unit voor of achter de waarde te plaatsen
+                          			return self.showyticks ? (self.yunit1prefix ? (self.yunit1 + this.value) : this.value + self.yunit1): "";
+
+
                             }
                         },
                         tickLength: this.showyticks ? 5 : 0
@@ -130,7 +185,13 @@ define(["dojo/_base/declare"],
                                     tickLength: this.showyticks ? 5 : 0,
                                     labels: {
                                         formatter: function() {
-                                            return self.showyticks ? this.value + " " + self.yunit2 : "";
+                                            //return self.showyticks ? this.value + " " + self.yunit2 : "";
+
+
+                                          // 2015-08-09 - Wouter van Stralen: formatter aangepast om unit voor of achter de waarde te plaatsen
+                                          return self.showyticks ? (self.yunit1prefix ? (self.yunit2 + this.value) : this.value + self.yunit2): "";
+
+
                                         }
                                     }
                                 };
@@ -169,10 +230,34 @@ define(["dojo/_base/declare"],
                         yAxis: yaxis,
                         tooltip: {
                             enabled: this.showhover,
-                            formatter: function() {
-                                return "<b>" + this.series.seriesnames + "</b><br/>" + this.point.labelx + ": " +
-                                    (self.charttype === "pie" ? dojo.number.round(this.percentage, 2) + "%" : this.point.labely);
-                            }
+                            shared: this.sharedtooltip,
+                            crosshairs: this.showcrosshairs,
+                            //formatter: function() {
+                            //    return "<b>" + this.series.seriesnames + "</b><br/>" + this.point.labelx + ": " +
+                            //        (self.charttype === "pie" ? dojo.number.round(this.percentage, 2) + "%" : this.point.labely);
+                            //}
+
+
+
+                            // 20151221 Edit Wouter - do not show value in tooltip if isNaN
+                            formatter: function () {
+                              if (!self.sharedtooltip) {
+                                return '<b>'+ this.series.name + '</b><br/>' + this.point.labelx +
+                                              (self.charttype == 'pie' ? ': '+dojo.number.round(this.percentage, 2) + '%' : (isNaN(this.point.labely) ? "" : ': '+this.point.labely));
+                              } else {
+                                var size = this.points.length;
+                                var s = '<b>' + self.getXLabelForValue(this.x) + '</b>';
+                                for(var i = 0; i < size; i++) {
+                                  s += '<br/>' + this.points[i].point.series.name + ': ';
+                                  s += Highcharts.numberFormat(this.points[i].point.y, 2, '.');
+                                };
+                                return s;
+                              }
+                            },
+
+
+
+
                         },
                         plotOptions: {
                             series: {

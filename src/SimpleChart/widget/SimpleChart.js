@@ -71,7 +71,51 @@ require({
             uselinearscaling: true,
             constraintentity: "",
             filtername: "",
-            filterattr: ""
+            filterattr: "",
+
+            // custom inserts
+            debugging: false, //insert jibbe
+            sharedtooltip: false, //insert jibbe
+            exporting: false, //insert jibbe
+            //step: "", //insert jibbe
+            //dashStyle: "", //insert jibbe
+            pie_datalabelsdistance: "", //insert jibbe
+            pie_showdatalabels: "", //insert jibbe
+            pie_semicircledonutchart: true, //insert jibbe
+            pie_3ddepth:"", //insert jibbe
+            pie_showlabelspercentage: 0,// insert jibbe
+            pie_colors: "", //insert jibbe
+            column_pointpadding:"", //insert jibbe
+            column_grouppadding:"", //insert jibbe
+            column_borderwidth:"", //insert jibbe
+            column_3ddepth:"", //insert jibbe
+            enable_3d: false, //insert jibbe
+            useUTC: true, //insert jibbe
+            stacking: "", //insert jibbe
+            seriesstack: "", //insert jibbe
+            yAxisGauge:"",// insert jibbe
+            plotBandEntity:"",
+            lowRedBegin: 0,
+            lowRedEnd: 20,
+            greenBegin: 40,
+            greenEnd: 60,
+            redBegin: 80,
+            redEnd: 100,
+            green: "rgba(139, 195, 74, 0.60)",
+            //green: "rgba(176, 198, 51, 0.60)", //Hortilux nieuwe huisstijl
+            red: "rgba(244, 67, 54, 0.60)",
+            orange: "rgba(255, 152, 0, 0.60)",
+            enablePlotbands: false,
+            Absolute: false, //insert Wouter
+            AddSuffix: false, //insert Wouter
+            plotonxaxis: false, //insert Wouter
+            splitseries_enabled: false,
+            showcrosshairs: false, //insert Wouter
+            markerradius: "", //insert Wouter
+            markersymbol: "", //insert Wouter
+            yAxisMin: 0, //insert Wouter
+            EnableyAxisMin: false, //insert Wouter
+            listentogrid: false,
         },
 
         //IMPLEMENTATION
@@ -200,6 +244,117 @@ require({
             }
         },
 
+
+
+
+
+        loadSchema : function (attr, name) {
+
+      		if (attr !== '') {
+      			this.splits[name] = attr.split("/");
+      			if (this.splits[name].length > 1)
+      				if (this.refs[this.splits[name][0]] && this.refs[this.splits[name][0]].attributes){
+      					this.refs[this.splits[name][0]].attributes.push(this.splits[name][2]);
+      				}
+      				else {
+      					this.refs[this.splits[name][0]] = {attributes : [this.splits[name][2]]};
+      				}
+      			else {
+      				this.schema.push(attr);
+      			}
+      		}
+      	},
+      	getListObjects : function(contextguid, callback) {
+
+      		var xpathString = '';
+      		//TODO JH: Add plotband enabled filter
+      		if (contextguid > 0){
+      			xpathString = "//" + this.plotBandEntity + "[id=" + contextguid + "]" ;
+      		}
+      		else{
+      			xpathString = "//" + this.plotBandEntity;
+      		}
+      		this.schema = [];
+      		this.refs = {};
+
+      		this.loadSchema(this.greenBegin, 'greenBegin');
+      		this.loadSchema(this.greenEnd, 'greenEnd');
+      		this.loadSchema(this.lowRedBegin, 'lowRedBegin');
+      		this.loadSchema(this.lowRedEnd, 'lowRedEnd');
+      		this.loadSchema(this.highRedBegin, 'highRedBegin');
+      		this.loadSchema(this.highRedEnd, 'highRedEnd');
+
+      		// With empty schema whole object is being pushed, this is a temporary fix
+      		// JH: Just give me the whole object
+      		//if (this.schema.length == 0){
+      			//this.schema.push('createdDate');
+      		//}
+
+      		//JH: disabled dirs
+      		//console.dir(this.schema);
+      		//console.dir(this.refs);
+      		mx.data.get({
+      			xpath       : xpathString,
+      			filter      : {
+      				attributes  : this.schema,
+      				references	: this.refs
+      			},
+      			callback    : dojo.hitch(this, this.processObjectsList, callback),
+      			error       : dojo.hitch(this, function(err) {
+      				console.error("GoogleMapsPolygon: Unable to retrieve data: " + err);
+      			})
+      		});
+
+      	},
+      	processObjectsList : function (callback, objectsArr) {
+
+      		this.objects = this.parseObjects(objectsArr);
+
+      		this.hascontext = true;
+      		this.refresh();
+
+      		if (this.autorefresh){
+      			mx.data.subscribe(this, this.dataobject);
+      		}
+      		if (callback && typeof(callback) == "function"){
+      				callback();
+      		}
+      	},
+      	parseObjects : function (objs) {
+      		var newObjs = [];
+      		for (var i = 0; i < objs.length; i++) {
+      			var newObj = {};
+      			var entity = objs[i].getEntity();
+      			var entityString = entity.substr(entity.indexOf('.')+1);		// added to have type of geoobject available when plotting
+      			newObj['type'] = entityString;									// first checkref on all generic attributes of geoobject
+      			newObj['lowRedBegin'] = this.checkRef(objs[i], 'lowRedBegin', this.lowRedBegin);
+      			newObj['lowRedEnd'] = this.checkRef(objs[i], 'lowRedEnd', this.lowRedEnd);
+
+      			newObj['greenBegin'] = this.checkRef(objs[i], 'greenBegin', this.greenBegin);
+      			newObj['greenEnd'] = this.checkRef(objs[i], 'greenEnd', this.greenEnd);
+
+      			newObj['highRedBegin'] = this.checkRef(objs[i], 'highRedBegin', this.highRedBegin);
+      			newObj['highRedEnd'] = this.checkRef(objs[i], 'highRedEnd', this.highRedEnd);
+
+
+      			newObj['guid'] = objs[i].getGuid();
+      			newObjs.push(newObj);
+
+      		}
+      		return newObjs;
+      	},
+      	checkRef : function (obj, attr, nonRefAttr) {
+      		if (this.splits && this.splits[attr] && this.splits[attr].length > 1) {
+      			var subObj = obj.getChildren(this.splits[attr][0]);
+      			return (subObj.length > 0)?subObj[0].get(this.splits[attr][2]):'';
+      		} else {
+      			return obj.get(nonRefAttr);
+      		}
+      	},
+
+
+
+
         objectUpdate: function(newobject, callback) {
             this.refresh();
             if (callback) {
@@ -281,7 +436,24 @@ require({
                             attributes: [path[2]]
                         };
                 }
-            }
+
+
+
+
+
+
+
+
+
+                // JH: Add to schema to retrieve shadow-y attribute
+          			if (serie.splitseries_enabled && serie.splitseries_attribute && serie.splitseries_attribute != '' ){
+          				serie.schema.attributes.push(serie.splitseries_attribute);
+          			}
+
+          		}
+
+
+
 
             //execute the get.
 
@@ -388,6 +560,16 @@ require({
                                     labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                             }
 
+                            // Determine whether this datapoint requires the secondary style
+                						var sy = false;
+                						if(serie.splitseries_enabled){
+                							// Get the splitattribute value
+                							sy_val = rawdata[i][2].get(serie.splitseries_attribute);
+                							sy_lim = serie.splitseries_value;
+                							// TODO JH: Possibly insert operator here, e.g. sy_lim sy_operator sy_value
+                							sy = eval('sy_val == sy_lim');
+                						}
+
                             var pos;
                             if (this.iscategories) {
                                 pos = jQuery.inArray(labelx, this.categoriesArray);
@@ -402,15 +584,46 @@ require({
                                 }
                             }
 
+                						var yval = "";
+                						var ymin = "";
+                						if (this.EnableyAxisMin){
+                							ymin = this.yAxisMin;
+                						} else if (this.chart){
+                              ymin = this.chart.yAxis[0].getExtremes().min;
+                						}
+
+                						if(serie.plotonxaxis) {
+                							yval = ymin;
+                							}
+                							else{
+                							         yval = this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)) : this.aggregate(serie.seriesaggregate, currenty);
+                							}
+
                             var newitem = {
                                 index: this.iscategories ? currentx : serie.data.length,
                                 origx: this.iscategories ? currentx : parseFloat(currentx),
                                 labelx: labelx,
                                 guid: rawdata[i][2].getGuid(),
-                                y: this.aggregate(serie.seriesaggregate, currenty)
+                                //y: this.aggregate(serie.seriesaggregate, currenty)
+
+
+                                origy : this.aggregate(serie.seriesaggregate, currenty),
+                                y: yval,
+                  							//y : this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)) : this.aggregate(serie.seriesaggregate, currenty),
+                  							shadowy: sy
+
+
+
                             };
 
-                            newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.y));
+
+                            // 16112015 - Insert Wouter: origy will not be made absolute and is used in labely
+                            newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.origy));
+                            //newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.y));
+
+
+
+
                             if (this.charttype === "pie" && pos >= 0) { //#ticket 9446, show amounts if pie
                                 newitem.labelx += " (" + newitem.labely + ")";
                                 this.categoriesArray[pos] = newitem.labelx;
@@ -622,9 +835,44 @@ require({
             return "";
         },
 
-        getFormattedYValue: function(serie, value) {
-            return ("" + dojo.number.round(value, 2)) + " " + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2);
-        },
+        //getFormattedYValue: function(serie, value) {
+          //  return ("" + dojo.number.round(value, 2)) + " " + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2);
+        //},
+
+
+        // 2015-08-09 - Wouter van Stralen: getFormattedYValue aangepast om unit voor of achter de waarde te plaatsen
+      	getFormattedYValue : function(serie, value) {
+              if (serie.AddSuffix) {
+      			if (this.yunit1prefix === true && value >= 0) {
+      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2))+'<b> (i)</b>';
+      			}
+      			else if (this.yunit1prefix === true && value < 0) {
+      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + Math.abs((dojo.number.round(value, 2)))+'<b> (c)</b>';
+      			}
+      			else if (this.yunit1prefix === false && value >= 0) {
+                      return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2)+'<b> (i)</b>';
+      			}
+      			else {
+      				return Math.abs((dojo.number.round(value, 2))) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2)+'<b> (c)</b>';
+      			}
+      		}
+      		else{
+      			if (this.yunit1prefix === true) {
+      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2)) ;
+      			}
+      			else {
+      				return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) ;
+      			}
+      		}
+      	},
+
+
+
+
+
+
+
+
 
 
         getFormattedDateTime: function(date) {

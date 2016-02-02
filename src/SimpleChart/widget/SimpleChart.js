@@ -20,58 +20,58 @@
 */
 require({
     packages: [{
-        name: 'jquery',
-        location: '../../widgets/SimpleChart/widget/lib/flot',
-        main: 'jquery.min'
+        name: "jquery",
+        location: "../../widgets/SimpleChart/widget/lib/flot",
+        main: "jquery.min"
     }]
-}, ['dojo/_base/declare', 'mxui/widget/_WidgetBase', 'mxui/mixin/_Contextable',
-    'jquery', 'SimpleChart/widget/flot', 'SimpleChart/widget/highcharts',
-    'dijit/form/DateTextBox', 'dijit/form/NumberTextBox' , 'dijit/form/TextBox', 'dijit/form/CheckBox', 'dijit/form/Button'
+}, ["dojo/_base/declare", "mxui/widget/_WidgetBase", "mxui/mixin/_Contextable",
+    "jquery", "SimpleChart/widget/flot", "SimpleChart/widget/highcharts",
+    "dijit/form/DateTextBox", "dijit/form/NumberTextBox" , "dijit/form/TextBox", "dijit/form/CheckBox", "dijit/form/Button"
 
-], function(declare, _WidgetBase, _Contextable, jQuery, flot, highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
-    'use strict';
+], function(declare, _WidgetBase, _Contextable, jQuery, Flot, Highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
+    "use strict";
 
-    // Declare widget's prototype.
-    return declare('SimpleChart.widget.SimpleChart', [_WidgetBase, _Contextable], {
+    // Declare widget"s prototype.
+    return declare("SimpleChart.widget.SimpleChart", [_WidgetBase, _Contextable], {
 
         //DECLARATION
         inputargs: {
             tabindex: 0,
             wwidth: 400,
             wheight: 400,
-            charttype: 'pie',
-            caption: '',
+            charttype: "pie",
+            caption: "",
             polltime: 0,
-            seriesnames: '',
-            seriesentity: '',
-            seriesconstraint: '',
-            seriescategory: '',
-            seriesvalues: '',
-            seriescolor: '',
-            seriesshowpoint: '',
-            seriesclick: '',
-            seriesaggregate: '',
-            xastitle: '',
-            yastitle: '',
-            yastitle2: '',
-            seriesyaxis: '',
+            seriesnames: "",
+            seriesentity: "",
+            seriesconstraint: "",
+            seriescategory: "",
+            seriesvalues: "",
+            seriescolor: "",
+            seriesshowpoint: "",
+            seriesclick: "",
+            seriesaggregate: "",
+            xastitle: "",
+            yastitle: "",
+            yastitle2: "",
+            seriesyaxis: "",
             enablezoom: false,
             inverted: false,
-            chartprovider: 'flot',
-            extraoptions: '',
+            chartprovider: "flot",
+            extraoptions: "",
             showlegend: true,
             showxticks: true,
             showyticks: true,
             showhover: true,
             autorefresh: false,
-            dateaggregation: 'none', // or hour/day/month/year
-            dateformat: '',
-            yunit1: '',
-            yunit2: '',
+            dateaggregation: "none", // or hour/day/month/year
+            dateformat: "",
+            yunit1: "",
+            yunit2: "",
             uselinearscaling: true,
-            constraintentity: '',
-            filtername: '',
-            filterattr: ''
+            constraintentity: "",
+            filtername: "",
+            filterattr: ""
         },
 
         //IMPLEMENTATION
@@ -89,15 +89,15 @@ require({
         refreshSub: null,
 
         splitprop: function(prop) {
-            return this[prop] != "" ? this[prop].split(";") : [""];
+            return this[prop] !== "" ? this[prop].split(";") : [""];
         },
 
         postCreate: function() {
             mxui.dom.addCss(require.toUrl("SimpleChart/widget/ui/SimpleChart250.css"));
 
             dojo.style(this.domNode, {
-                width: this.wwidth + 'px',
-                height: this.wheight + 'px'
+                width: this.wwidth + "px",
+                height: this.wheight + "px"
             });
             dojo.addClass(this.domNode, "SimpleChartOuter");
 
@@ -105,7 +105,7 @@ require({
             this.series = [];
             for (var i = 0; i < this.doesnotmatter2.length; i++) {
                 var serie = this.doesnotmatter2[i];
-                if (serie.seriesconstraint.indexOf('[%CurrentObject%]') > -1) {
+                if (serie.seriesconstraint.indexOf("[%CurrentObject%]") > -1) {
                     this.usecontext = true;
                 }
                 this.series[i] = serie;
@@ -113,16 +113,17 @@ require({
 
             //create the filters object
             this.filters = [];
-            for (var i = 0; i < this.stilldoesntmatter.length; i++) {
-                this.filters[i] = this.stilldoesntmatter[i];
+            for (var j = 0; j < this.stilldoesntmatter.length; j++) {
+                this.filters[j] = this.stilldoesntmatter[j];
             }
 
             //mix chart implementations in as kind of addon, but lazy loaded..
-            if (this.chartprovider === 'flot') {
-                var chart = new flot();
+            var chart;
+            if (this.chartprovider === "flot") {
+                chart = new Flot();
                 dojo.mixin(this, chart);
-            } else if (this.chartprovider === 'highcharts') {
-                var chart = new highcharts();
+            } else if (this.chartprovider === "highcharts") {
+                chart = new Highcharts();
                 dojo.mixin(this, chart);
             }
 
@@ -147,14 +148,14 @@ require({
         },
 
         start: function() {
-            if (this.polltime > 0 && this.refreshhandle == null)
+            if (this.polltime > 0 && this.refreshhandle === null)
                 this.refreshhandle = setInterval(dojo.hitch(this, function() {
                     this.refresh();
                 }), this.polltime * 1000);
         },
 
         stop: function() {
-            if (this.refreshhandle != null)
+            if (this.refreshhandle !== null)
                 clearInterval(this.refreshhandle);
             this.refreshhandle = null;
         },
@@ -180,7 +181,7 @@ require({
             if (this.dataobject && this.autorefresh)
                 mx.data.unsubscribe(this.refreshSub);
 
-            if (context && context.getTrackId() != "" && this.usecontext) {
+            if (context && context.getTrackId() !== "" && this.usecontext) {
                 this.dataobject = context.getTrackId();
                 this.hascontext = true;
                 this.refresh();
@@ -191,14 +192,19 @@ require({
                         callback : dojo.hitch(this, this.objectUpdate)
                     });
                 }
-            } else
+            } else {
                 logger.warn(this.id + ".applyContext received empty context");
-            callback && callback();
+            }
+            if (callback) {
+                callback();
+            }
         },
 
         objectUpdate: function(newobject, callback) {
             this.refresh();
-            callback && callback();
+            if (callback) {
+                callback();
+            }
         },
 
         refresh: function() {
@@ -222,7 +228,7 @@ require({
                 this.waitingForVisible = false;
             });
 
-            if (dojo.marginBox(this.domNode).h == 0) { //postpone update if hidden
+            if (dojo.marginBox(this.domNode).h === 0) { //postpone update if hidden
                 mendix.lang.runOrDelay(
                     loadfunc,
                     dojo.hitch(this, function() {
@@ -247,17 +253,17 @@ require({
             this.refreshing++;
             var serie = this.series[index];
 
-            if (serie.schema == null) {
+            if (serie.schema === null) {
                 serie.schema = {
                     attributes: [],
                     references: {},
                     sort: [
-                        [serie.seriescategory, 'asc']
+                        [serie.seriescategory, "asc"]
                     ]
                 };
 
                 var cat = serie.seriescategory.split("/");
-                if (cat.length == 1)
+                if (cat.length === 1)
                     serie.schema.attributes.push(serie.seriescategory);
                 else {
                     serie.schema.references[cat[0]] = {
@@ -268,7 +274,7 @@ require({
 
                 if (serie.seriesvalues) {
                     var path = serie.seriesvalues.split("/");
-                    if (path.length == 1)
+                    if (path.length === 1)
                         serie.schema.attributes.push(serie.seriesvalues);
                     else
                         serie.schema.references[path[0]] = {
@@ -279,13 +285,14 @@ require({
 
             //execute the get.
 
+            var xPath = "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject);
             mx.data.get({
-                xpath: "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject),
+                xpath: xPath,
                 filter: serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward,
                 callback: dojo.hitch(this, this.retrieveData, index),
                 //sort: serie.seriescategory,
                 error: dojo.hitch(this, function(err) {
-                    console.error("Unable to retrieve data for xpath '" + xpath + "': " + err, err);
+                    console.error("Unable to retrieve data for xpath '" + xPath + "': " + err, err);
                 })
             });
         },
@@ -294,7 +301,7 @@ require({
             if (attribute.length === 1)
                 return baseObject.metaData;
             var sub = baseObject.getChild(attribute[0]);
-            if (sub == null || sub._guid == 0)
+            if (sub === null || sub._guid === 0)
                 throw "Reference to category attribute cannot be empty!";
             return sub.metaData;
         },
@@ -313,10 +320,10 @@ require({
                     var len = objects.length;
                     for (var i = 0; i < len; i++) {
                         //check the data category type
-                        if (i == 0 && this.firstrun) {
+                        if (i === 0 && this.firstrun) {
                             try {
                                 var mdOwner = this.getMetaDataPropertyOwner(objects[i], labelattr);
-                                if (mdOwner != null) {
+                                if (mdOwner !== null) {
                                     this.firstrun = false;
                                     this.isdate = mdOwner.isDate(labelattr[labelattr.length - 1]);
                                     if (this.isdate)
@@ -333,25 +340,27 @@ require({
 
                         //get the x value
                         var x;
-                        if (labelattr.length == 1)
+                        if (labelattr.length === 1)
                             x = this.dateRound(objects[i].get(serie.seriescategory));
                         else {
                             var sub = objects[i].getChild(labelattr[0]);
-                            if (sub == null || sub._guid == 0)
-                                x = "(undefined)"
-                            else
+                            if (sub === null || sub._guid === 0) {
+                                x = "(undefined)";
+                            } else {
                                 x = this.dateRound(sub.get(labelattr[2]));
+                            }
                         }
 
                         //get the y value
                         if (!valueattr) //not defined
                             rawdata.push([x, 1, objects[i]]);
-                        else if (valueattr.length == 1) //attr
+                        else if (valueattr.length === 1) //attr
                             rawdata.push([x, parseFloat(objects[i].get(valueattr[0])), objects[i]]);
                         else { //reference
                             var subs = objects[i].getChildren(valueattr[0]);
-                            for (var j = 0; j < subs.length; j++)
+                            for (var j = 0; j < subs.length; j++) {
                                 rawdata.push([x, parseFloat(subs[j].get(valueattr[2])), objects[i]]);
+                            }
                         }
                     }
 
@@ -362,32 +371,33 @@ require({
                         var currentx = rawdata[i][0];
                         currenty.push(rawdata[i][1]);
 
-                        if (i < len - 1 && currentx === rawdata[i + 1][0] && serie.seriesaggregate != 'none')
+                        if (i < len - 1 && currentx === rawdata[i + 1][0] && serie.seriesaggregate !== "none")
                             continue;
                         else {
                             //calculate the label, which, can be a referred attr...
                             var labelx = "";
                             if (!this.iscategories)
                                 labelx = this.getFormattedXValue(currentx);
-                            else if (labelattr.length == 1)
+                            else if (labelattr.length === 1)
                                 labelx = mx.parser.formatAttribute(rawdata[i][2], labelattr[0]);
                             else {
                                 var sub = rawdata[i][2].getChild(labelattr[0]);
-                                if (sub == null || sub._guid == 0)
-                                    labelx = "(undefined)"
+                                if (sub === null || sub._guid === 0)
+                                    labelx = "(undefined)";
                                 else
                                     labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                             }
 
+                            var pos;
                             if (this.iscategories) {
-                                var pos = jQuery.inArray(labelx, this.categoriesArray);
+                                pos = jQuery.inArray(labelx, this.categoriesArray);
 
                                 if (pos < 0) {
                                     pos = this.categoriesArray.length;
                                     this.categoriesArray[pos] = labelx;
                                 }
 
-                                if (this.charttype != 'pie') {
+                                if (this.charttype !== "pie") {
                                     currentx = pos;
                                 }
                             }
@@ -401,9 +411,8 @@ require({
                             };
 
                             newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.y));
-                            if (this.charttype == 'pie') { //#ticket 9446, show amounts if pie
+                            if (this.charttype === "pie" && pos >= 0) { //#ticket 9446, show amounts if pie
                                 newitem.labelx += " (" + newitem.labely + ")";
-
                                 this.categoriesArray[pos] = newitem.labelx;
                             }
 
@@ -432,7 +441,7 @@ require({
         sortAndRenderSeries: function() {
             var allSeriesLoaded = true;
             for (var i in this.series) {
-                if (this.series[i].loaded != true) {
+                if (this.series[i].loaded !== true) {
                     allSeriesLoaded = false;
                     break;
                 }
@@ -442,8 +451,8 @@ require({
                 this.sortdata();
 
                 if (dojo.marginBox(this.domNode).h > 0) { //bugfix: do not draw if the element is hidden
-                    for (var i in this.series) {
-                        this.renderSerie(i);
+                    for (var s in this.series) {
+                        this.renderSerie(s);
                     }
                 }
             }
@@ -458,7 +467,7 @@ require({
                     var serie = this.series[seriesindex];
                     var labelattr = serie.seriescategory.split("/");
                     var attrname = labelattr[labelattr.length - 1];
-                    var meta = mx.meta.getEntity(labelattr.length == 1 ? serie.seriesentity : labelattr[1]);
+                    var meta = mx.meta.getEntity(labelattr.length === 1 ? serie.seriesentity : labelattr[1]);
 
                     //put them in a maps
                     var targetmap = {};
@@ -486,49 +495,49 @@ require({
         aggregate: function(aggregate, vals) {
             var result = 0;
             switch (aggregate) {
-                case 'sum':
-                case 'logsum':
+                case "sum":
+                case "logsum":
                     dojo.forEach(vals, function(value) {
                         result += value;
                     });
-                    if (aggregate == 'logsum')
+                    if (aggregate === "logsum")
                         result = Math.log(result);
                     break;
-                case 'count':
+                case "count":
                     dojo.forEach(vals, function(value) {
                         result += 1;
                     });
                     break;
-                case 'avg':
+                case "avg":
                     dojo.forEach(vals, function(value) {
                         result += value;
                     });
                     break;
-                case 'min':
+                case "min":
                     result = Number.MAX_VALUE;
                     dojo.forEach(vals, function(value) {
                         if (value < result)
                             result = value;
                     });
                     break;
-                case 'max':
+                case "max":
                     result = Number.MIN_VALUE;
                     dojo.forEach(vals, function(value) {
                         if (value > result)
                             result = value;
                     });
                     break;
-                case 'none':
-                case 'first':
+                case "none":
+                case "first":
                     result = vals[0];
                     break;
-                case 'last':
+                case "last":
                     result = vals.length > 0 ? vals[vals.length - 1] : 0;
                     break;
                 default:
                     this.showError("Unimplemented aggregate: " + aggregate);
             }
-            if (aggregate == "avg")
+            if (aggregate === "avg")
                 return vals.length > 0 ? result / vals.length : 0;
             return result;
         },
@@ -538,7 +547,7 @@ require({
                 mx.data.action({
                     params       : {
                         actionname : this.series[serie].seriesclick,
-                        applyto: 'selection',
+                        applyto: "selection",
                         guids: [this.series[serie].data[itemindex].guid]
                     },
                     error: function() {
@@ -622,49 +631,49 @@ require({
 
             var format = null;
             switch (this.dateformat) {
-                case 'fulldate':
-                    return date.toLocaleDateString(); /*format = { selector : 'date', datePattern : "y-MM-dd"};*/
-                case 'datetime':
+                case "fulldate":
+                    return date.toLocaleDateString(); /*format = { selector : "date", datePattern : "y-MM-dd"};*/
+                case "datetime":
                     return date.toLocaleDateString() + " " + dojo.date.locale.format(date, {
-                        selector: 'time',
+                        selector: "time",
                         timePattern: "HH:mm"
                     }); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
-                case 'day':
+                case "day":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "EEE"
                     };
                     break;
-                case 'month':
+                case "month":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "MMM"
                     };
                     break;
-                case 'monthday':
+                case "monthday":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "dd MMM"
                     };
                     break;
-                case 'year':
+                case "year":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "y"
                     };
                     break;
-                case 'yearmonth':
+                case "yearmonth":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "MMM y"
                     };
                     break;
-                case 'weekyear':
-                    //format = { selector : 'date', datePattern : "w - y"};
-                    return this.getWeekNr(date) + ' - ' + this.getWeekYear(date);
-                case 'time':
+                case "weekyear":
+                    //format = { selector : "date", datePattern : "w - y"};
+                    return this.getWeekNr(date) + " - " + this.getWeekYear(date);
+                case "time":
                     format = {
-                        selector: 'time',
+                        selector: "time",
                         timePattern: "HH:mm"
                     };
                     break;
@@ -694,7 +703,7 @@ require({
 
 
         dateRound: function(x) {
-            if (!this.isdate || this.dateaggregation == 'none')
+            if (!this.isdate || this.dateaggregation === "none")
                 return x;
 
             var d = new Date(x);
@@ -702,21 +711,24 @@ require({
                 return x;
 
             switch (this.dateaggregation) {
-                case 'year':
+                case "year":
                     d.setMonth(0);
-                case 'month':
+                    break;
+                case "month":
                     d.setDate(1);
-                case 'day':
-                    d.setHours(0)
-                case 'hour':
+                    break;
+                case "day":
+                    d.setHours(0);
+                    break;
+                case "hour":
                     d.setMinutes(0);
                     d.setSeconds(0);
                     d.setMilliseconds(0);
                     break;
-                case 'week':
+                case "week":
                     var distance = 1 - d.getDay();
                     d.setDate(d.getDate() + distance);
-                    d.setHours(0)
+                    d.setHours(0);
                     d.setMinutes(0);
                     d.setSeconds(0);
                     d.setMilliseconds(0);
@@ -729,17 +741,17 @@ require({
         //////// SECTION FILTER IMPLEMENTATION
 
         getActiveConstraint: function(index) {
-            if (this.series[index].seriesentity != this.constraintentity)
+            if (this.series[index].seriesentity !== this.constraintentity)
                 return "";
             var res = "";
             for (var i = 0; i < this.filters.length; i++) {
                 var filter = this.filters[i];
-                if (filter.value && filter.value != {} && filter.value != '') {
+                if (filter.value && filter.value !== {} && filter.value !== "") {
                     if (filter.filterattr.indexOf("/") > -1) {
-                        for (key in filter.value)
-                            if (filter.value[key] == true) {
+                        for (var key in filter.value)
+                            if (filter.value[key] === true) {
                                 var attr = filter.filterattr.split("/");
-                                res += "[" + filter.filterattr + " = '" + this.escapeQuotes(key) + "']";
+                                res += "[" + filter.filterattr + " = \"" + this.escapeQuotes(key) + "\"]";
                                 break;
                             }
                         continue;
@@ -754,19 +766,19 @@ require({
                             break;
                         case "String":
                             if (dojo.isString(filter.value))
-                                res += "[contains(" + filter.filterattr + ",'" + this.escapeQuotes(filter.value) + "')]";
+                                res += "[contains(" + filter.filterattr + ",\"" + this.escapeQuotes(filter.value) + "\")]";
                             break;
                         case "Boolean":
                         case "Enum":
                             var enums = "";
                             var all = true; //if all are checked, include null values
                             for (var key in filter.value) {
-                                if (filter.value[key] == true)
-                                    enums += "or " + filter.filterattr + "= " + (filter.type == "Enum" ? "'" + key + "'" : key) + " ";
+                                if (filter.value[key] === true)
+                                    enums += "or " + filter.filterattr + "= " + (filter.type === "Enum" ? "\"" + key + "\"" : key) + " ";
                                 else
                                     all = false;
                             }
-                            if (enums != "" && !all)
+                            if (enums !== "" && !all)
                                 res += "[" + enums.substring(2) + "]";
                             break;
                         default:
@@ -794,10 +806,10 @@ require({
 
             for (var i = 0; i < this.inputs.length; i++) {
                 var input = this.inputs[i];
-                if (input.declaredClass == "dijit.form.CheckBox")
+                if (input.declaredClass === "dijit.form.CheckBox")
                     input.setValue(true);
-                else if (input.nodeName == "SELECT")
-                    input.value = '';
+                else if (input.nodeName === "SELECT")
+                    input.value = "";
                 else
                     input.setValue(null);
             }
@@ -806,21 +818,21 @@ require({
         },
 
         createrangeNode: function() {
-            if (this.constraintentity == "")
+            if (this.constraintentity === "")
                 return;
 
-            var open = mxui.dom.create('span', {
-                'class': "SimpleChartFilterOpen"
+            var open = mxui.dom.create("span", {
+                "class": "SimpleChartFilterOpen"
             }, "(filter)");
             this.connect(open, "onclick", function() {
                 dojo.style(this.rangeNode, {
-                    display: 'block'
+                    display: "block"
                 });
             });
             dojo.place(open, this.domNode);
 
-            var n = this.rangeNode = mxui.dom.create('div', {
-                'class': 'SimpleChartRangeNode'
+            var n = this.rangeNode = mxui.dom.create("div", {
+                "class": "SimpleChartRangeNode"
             });
             dojo.place(n, this.domNode);
 
@@ -836,8 +848,8 @@ require({
             try {
                 this.inputs = [];
 
-                var close = mxui.dom.create('span', {
-                    'class': "SimpleChartFilterClose"
+                var close = mxui.dom.create("span", {
+                    "class": "SimpleChartFilterClose"
                 }, "x");
                 this.connect(close, "onclick", this.closeFilterBox);
                 dojo.place(close, this.rangeNode);
@@ -846,21 +858,21 @@ require({
                     var filter = this.filters[i];
 
                     filter.value = {};
-                    var catNode = mxui.dom.create('div', {
-                        'class': "SimpleChartFilterCat"
+                    var catNode = mxui.dom.create("div", {
+                        "class": "SimpleChartFilterCat"
                     });
                     dojo.place(catNode, this.rangeNode);
 
                     if (filter.filterattr.indexOf("/") > -1) {
                         if (this.usecontext)
-                            this.connect(this, 'applyContext', dojo.hitch(this, this.addReferencedFilterAttr, filter, catNode)); //wait for context
+                            this.connect(this, "applyContext", dojo.hitch(this, this.addReferencedFilterAttr, filter, catNode)); //wait for context
                         else
-                            this.addReferencedFilterAttr(filter, catNode)
+                            this.addReferencedFilterAttr(filter, catNode);
                         continue;
                     }
 
-                    dojo.place(mxui.dom.create('span', {
-                        'class': "SimpleChartFilterLabel"
+                    dojo.place(mxui.dom.create("span", {
+                        "class": "SimpleChartFilterLabel"
                     }, filter.filtername), catNode);
                     filter.type = meta.getAttributeType(filter.filterattr);
 
@@ -881,7 +893,7 @@ require({
                     } else if (meta.isBoolean(filter.filterattr)) {
                         this.createCheckbox(catNode, filter, "true()", "True");
                         this.createCheckbox(catNode, filter, "false()", "False");
-                    } else if (filter.type == "String") {
+                    } else if (filter.type === "String") {
                         var widget = new TextBox();
                         widget.onChange = dojo.hitch(this, function(filter, value) {
                             filter.value = value;
@@ -896,7 +908,7 @@ require({
                     dojo.addClass(this.inputs[i].domNode, "SimpleChartFilterInput");
 
                 var update = new Button({
-                    'class': "btn mx-button btn-default SimpleChartFilterUpdate",
+                    "class": "btn mx-button btn-default SimpleChartFilterUpdate",
                     label: "update",
                     onClick: dojo.hitch(this, function() {
                         this.refresh();
@@ -905,7 +917,7 @@ require({
                 });
                 dojo.place(update.domNode, this.rangeNode);
                 var clear = new Button({
-                    'class': "btn mx-button btn-default SimpleChartFilterClear",
+                    "class": "btn mx-button btn-default SimpleChartFilterClear",
                     label: "clear",
                     onClick: dojo.hitch(this, this.clearConstraint)
                 });
@@ -921,8 +933,8 @@ require({
 
             dojo.empty(catNode);
 
-            dojo.place(mxui.dom.create('span', {
-                'class': "SimpleChartFilterLabel"
+            dojo.place(mxui.dom.create("span", {
+                "class": "SimpleChartFilterLabel"
             }, filter.filtername), catNode);
 
             var attrparts = filter.filterattr.split("/");
@@ -933,7 +945,7 @@ require({
             var dataconstraint = "";
 
             for (var i = 0; i < this.series.length; i++)
-                if (this.series[i].seriesentity == this.constraintentity)
+                if (this.series[i].seriesentity === this.constraintentity)
                     dataconstraint += this.series[i].seriesconstraint; //apply constraint of the data to the selectable items.
 
             mx.data.get({
@@ -942,7 +954,7 @@ require({
                     attributes: [attr],
                     references: {},
                     sort: [
-                        [attr, 'asc']
+                        [attr, "asc"]
                     ]
                 },
                 callback: dojo.hitch(this, this.retrieveFilterData, filter, catNode),
@@ -957,26 +969,26 @@ require({
                 return {
                     key: val,
                     caption: val
-                }
+                };
             }, this);
             this.createDropdown(catNode, filter, enums);
         },
 
         closeFilterBox: function() {
             dojo.style(this.rangeNode, {
-                display: 'none'
+                display: "none"
             });
         },
 
         createCheckbox: function(catNode, filter, value, caption) {
             filter.value[value] = true;
-            var wrapper = mxui.dom.create('div');
+            var wrapper = mxui.dom.create("div");
             var checkBox = new CheckBox({
                 value: value,
                 checked: true
             });
             dojo.place(checkBox.domNode, wrapper);
-            dojo.place(mxui.dom.create('label', {
+            dojo.place(mxui.dom.create("label", {
                 "class": "SimpleChartFilterCheckboxLabel"
             }, caption), wrapper);
             checkBox.onChange = dojo.hitch(this, function(filter, value, checked) {
@@ -987,14 +999,14 @@ require({
         },
 
         createDropdown: function(catNode, filter, valueArr) {
-            var selectNode = mxui.dom.create('select');
-            var optionNode = mxui.dom.create('option', {
-                value: ''
-            }, '');
+            var selectNode = mxui.dom.create("select");
+            var optionNode = mxui.dom.create("option", {
+                value: ""
+            }, "");
             selectNode.appendChild(optionNode);
             for (var i = 0; i < valueArr.length; i++)
                 if (!filter.value[valueArr[i].key]) { //avoid items to appear twice
-                    var optionNode = mxui.dom.create('option', {
+                    var optionNode = mxui.dom.create("option", {
                         value: valueArr[i].key
                     }, valueArr[i].caption);
                     filter.value[valueArr[i].key] = false;
@@ -1004,9 +1016,9 @@ require({
             dojo.place(selectNode, catNode);
             this.connect(selectNode, "onchange", dojo.hitch(selectNode, function(filter, e) {
                 for (var key in filter.value)
-                    filter.value[key] = key == this.value;
+                    filter.value[key] = key === this.value;
             }, filter));
-            selectNode['domNode'] = selectNode;
+            selectNode["domNode"] = selectNode;
             this.inputs.push(selectNode);
         },
 
@@ -1015,14 +1027,14 @@ require({
 
             var widget = new DateTextBox({});
             widget.onChange = dojo.hitch(this, function(filter, value) {
-                filter.value.start = value == null ? null : value.getTime();
+                filter.value.start = value === null ? null : value.getTime();
             }, filter);
             dojo.place(widget.domNode, catNode);
             this.inputs.push(widget);
 
             widget = new DateTextBox({});
             widget.onChange = dojo.hitch(this, function(filter, value) {
-                filter.value.end = value == null ? null : value.getTime();
+                filter.value.end = value === null ? null : value.getTime();
             }, filter);
             dojo.place(widget.domNode, catNode);
             this.inputs.push(widget);
@@ -1045,7 +1057,7 @@ require({
         },
 
         escapeQuotes: function(value) { //MWE: fix the fact that mxcompat is not correct for escapeQuotes in 3.0.0.
-            if ((typeof(mxui) != "undefined") && mxui.html)
+            if ((typeof(mxui) !== "undefined") && mxui.html)
                 return mxui.html.escapeQuotes(value);
             else
                 return mx.parser.escapeQuotesInString(value);
@@ -1060,8 +1072,8 @@ require({
                 console.dir(toadd);*/
                 for (var key in toadd) {
                     if ((key in base) &&
-                        ((dojo.isArray(toadd[key]) != dojo.isArray(base[key])) ||
-                            (dojo.isObject(toadd[key]) != dojo.isObject(base[key]))))
+                        ((dojo.isArray(toadd[key]) !== dojo.isArray(base[key])) ||
+                            (dojo.isObject(toadd[key]) !== dojo.isObject(base[key]))))
                         throw "Cannot mix object properties, property '" + key + "' has different type in source and destination object";
 
                     //mix array
@@ -1090,4 +1102,4 @@ require({
             console.dir(base);*/
         }
     });
-});;
+});

@@ -1,4 +1,5 @@
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src"); //or _src		
+/*global Highcharts*/
+dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src"); //or _src
 
 define(["dojo/_base/declare"],
     function(declare) {
@@ -7,34 +8,36 @@ define(["dojo/_base/declare"],
 
             //free up any resources used by the chart
             uninitializeChart: function() {
-                this.chart && this.chart.destroy();
+                if (this.chart) {
+                    this.chart.destroy();
+                }
             },
 
             //mapping between the SimpleChart charttype and the HighCharts charttype
             getChartTypeName: function(value) {
                 switch (value) {
-                    case 'pie':
-                        return 'pie';
-                    case 'bar':
-                        return 'column';
-                    case 'line':
-                        return 'line';
-                    case 'curve':
-                        return 'spline';
-                    case 'stackedline':
-                        return 'area';
-                    case 'stackedbar':
-                        return 'area';
+                    case "pie":
+                        return "pie";
+                    case "bar":
+                        return "column";
+                    case "line":
+                        return "line";
+                    case "curve":
+                        return "spline";
+                    case "stackedline":
+                        return "area";
+                    case "stackedbar":
+                        return "area";
                 }
-                return 'line';
+                return "line";
             },
 
-            //triggered if an serie needs to be (re) rendered as a result of receiving (new) data. 
+            //triggered if an serie needs to be (re) rendered as a result of receiving (new) data.
             renderSerie: function(index) {
                 try {
                     var serie = this.series[index];
                     //first serie, set the categories if names are used
-                    if (index == 0 && this.iscategories) {
+                    if (index === 0 && this.iscategories) {
                         var categories = [];
                         for (var i = 0; i < serie.data.length; i++)
                             categories.push(serie.data[i].labelx);
@@ -43,7 +46,7 @@ define(["dojo/_base/declare"],
 
                     var data = this.getSeriesData(index);
                     //if the serie was already created, replace its data
-                    if (this.chart.series[index] != undefined)
+                    if (this.chart.series[index] !== undefined)
                         this.chart.series[index].setData(data.data, false);
 
                     //otherwise add a new serie
@@ -60,15 +63,15 @@ define(["dojo/_base/declare"],
             //helper function to constructie a series data array for highcharts
             getSeriesData: function(index) {
                 var self = this;
-                var size = this.wwidth / this.series.length; //size if multiple pie's are used
+                var size = this.wwidth / this.series.length; //size if multiple pie"s are used
                 var serie = this.series[index];
 
                 //add a click event for each point
                 for (var j = 0; j < serie.data.length; j++)
                     (function() {
-                        var cur = index; //trap the current iteration in the scope 
+                        var cur = index; //trap the current iteration in the scope
                         var itemindex = j;
-                        serie.data[j]['events'] = {
+                        serie.data[j]["events"] = {
                             click: function(arg1, arg2, arg3) {
                                 self.clickCallback(cur, itemindex, this.pageX, this.pageY);
                             }
@@ -82,15 +85,15 @@ define(["dojo/_base/declare"],
                     data: serie.data,
                     color: serie.seriescolor,
                     type: this.getChartTypeName(this.charttype),
-                    showInLegend: this.charttype == 'pie' ? false : true,
+                    showInLegend: this.charttype === "pie" ? false : true,
                     //yAxis: serie.seriesyaxis == "true" ? 0 : 1 // was getting me trouble
                     yAxis: 0
                 };
 
                 //make positions for pie
-                if (this.series.length > 1 && this.charttype == 'pie') {
-                    data['center'] = [size * index, Math.round(this.wheight / 2) - 20];
-                    data['size'] = Math.round(this.wwidth / this.series.length) - 20;
+                if (this.series.length > 1 && this.charttype === "pie") {
+                    data["center"] = [size * index, Math.round(this.wheight / 2) - 20];
+                    data["size"] = Math.round(this.wwidth / this.series.length) - 20;
                 }
                 return data;
             },
@@ -98,6 +101,7 @@ define(["dojo/_base/declare"],
             //create a new chart, set all the default options
             renderChart: function() {
                 try {
+                    var self = this;
                     var yaxis = [{
                         title: {
                             text: this.yastitle
@@ -113,7 +117,7 @@ define(["dojo/_base/declare"],
                     //create seperate y axises
                     for (var i = 1; i < this.series.length; i++) {
                         var serie = this.series[i];
-                        if (serie.seriesyaxis != "true") {
+                        if (serie.seriesyaxis !== "true") {
                             if (yaxis.length > 1)
                                 continue;
                             else {
@@ -129,19 +133,19 @@ define(["dojo/_base/declare"],
                                             return self.showyticks ? this.value + " " + self.yunit2 : "";
                                         }
                                     }
-                                }
+                                };
                             }
                         }
                     }
 
-                    var self = this;
+
                     var options = {
                         credits: {
                             enabled: false
                         },
                         chart: {
                             renderTo: this.domNode,
-                            zoomType: this.enablezoom ? 'x' : null,
+                            zoomType: this.enablezoom ? "x" : null,
                             inverted: this.inverted,
                             width: this.width,
                             height: this.height
@@ -166,13 +170,13 @@ define(["dojo/_base/declare"],
                         tooltip: {
                             enabled: this.showhover,
                             formatter: function() {
-                                return '<b>' + this.series.seriesnames + '</b><br/>' + this.point.labelx + ': ' +
-                                    (self.charttype == 'pie' ? dojo.number.round(this.percentage, 2) + '%' : this.point.labely);
+                                return "<b>" + this.series.seriesnames + "</b><br/>" + this.point.labelx + ": " +
+                                    (self.charttype === "pie" ? dojo.number.round(this.percentage, 2) + "%" : this.point.labely);
                             }
                         },
                         plotOptions: {
                             series: {
-                                stacking: this.charttype == 'stack' ? 'normal' : null
+                                stacking: this.charttype === "stack" ? "normal" : null
                             },
                             pie: {
                                 dataLabels: {
@@ -182,23 +186,23 @@ define(["dojo/_base/declare"],
                                             return this.point.labelx + "<br/>(" + dojo.number.round(this.point.percentage, 0) + "%)";
                                         return "";
                                     },
-                                    color: 'white'
+                                    color: "white"
                                 }
                             }
                         },
                         legend: {
                             enabled: this.showlegend,
-                            borderWidth: this.charttype == 'pie' ? 0 : 1
+                            borderWidth: this.charttype === "pie" ? 0 : 1
                         }
                     };
 
-                    if (this.extraoptions != '')
+                    if (this.extraoptions !== "")
                         this.objectmix(options, dojo.fromJson(this.extraoptions));
                     this.chart = new Highcharts.Chart(options);
                 } catch (e) {
                     this.showError("Unable to render the chart, because of error: " + e);
                     console.error("Error while building chart: " + e);
-                    if (e.name == "SyntaxError")
+                    if (e.name === "SyntaxError")
                         this.showError("Please check whether the extra chart options are valid JSON");
                 }
                 return null;

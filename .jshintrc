@@ -8,9 +8,12 @@
     "eqeqeq"   : true,
     "undef"    : true,
     "globals"  : {
+        "logger" : false,
         "mendix" : false,
-        "mx"     : false
+        "mx"     : false,
+        "mxui"   : false
     },
+    "sub"      : true,
 
     // Relaxing
     "laxbreak" : true,
@@ -18,5 +21,9 @@
     // Environments
     "browser"  : true,
     "devel"    : true,
-    "dojo"     : true
+    "dojo"     : true,
+
+    // Exceptions to the rule
+    "-W004"    : false,      // prevent 'i is already defined'
+    "-W083"    : false       // Don't make functions in a loop
 }

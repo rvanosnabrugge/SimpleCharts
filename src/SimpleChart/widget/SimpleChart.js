@@ -124,10 +124,6 @@ require({
             greenBegin: 40,
             lowRedEnd: 20,
             lowRedBegin: 0,
-            green: "rgba(139, 195, 74, 0.60)",
-            // green: "rgba(176, 198, 51, 0.60)", //Hortilux nieuwe huisstijl
-            orange: "rgba(255, 152, 0, 0.60)",
-            red: "rgba(244, 67, 54, 0.60)",
 
             // Customizing
             extraoptions: "",
@@ -170,6 +166,11 @@ require({
         // splits	: null,
         // refs : null,
         // schema : null,
+
+        green: "rgba(139, 195, 74, 0.60)",
+        // green: "rgba(176, 198, 51, 0.60)", //Hortilux nieuwe huisstijl
+        orange: "rgba(255, 152, 0, 0.60)",
+        red: "rgba(244, 67, 54, 0.60)",
 
         splitprop: function(prop) {
             return this[prop] !== "" ? this[prop].split(";") : [""];
@@ -267,14 +268,13 @@ require({
 
             if (context && context.getTrackId() !== "" && this.usecontext) {
                 this.dataobject = context.getTrackId();
-                //this.contextGUID = context.getTrackId();
                 this.getListObjects(this.dataobject);
                 this.hascontext = true;
                 this.refresh();
 
-                if (this.autorefresh) { // Richard: excluded due to browser console error on "this.dataobject.getGuid()"
+                if (this.autorefresh) {
                     this.refreshSub = mx.data.subscribe({
-                        guid: this.dataobject, //.getGuid(),
+                        guid: this.dataobject,
                         callback: dojo.hitch(this, this.objectUpdate)
                     });
                 }
@@ -342,7 +342,10 @@ require({
             this.refresh();
 
             if (this.autorefresh) {
-                mx.data.subscribe(this, this.dataobject);
+                this.refreshSub = mx.data.subscribe({
+                    guid: this.dataobject,
+                    callback: dojo.hitch(this, this.objectUpdate)
+                });
             }
             if (callback && typeof(callback) === "function") {
                 callback();
@@ -565,6 +568,7 @@ require({
                     //loop raw data to aggregate
                     var currenty = [];
                     len = rawdata.length;
+
                     for (var i = 0; i < len; i++) {
                         var currentx = rawdata[i][0];
                         currenty.push(rawdata[i][1]);

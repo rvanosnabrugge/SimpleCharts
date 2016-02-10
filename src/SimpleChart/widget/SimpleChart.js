@@ -137,16 +137,16 @@ require({
             // pie_datalabelsdistance: "", //insert jibbe
             // pie_showdatalabels: "", //insert jibbe
             // pie_semicircledonutchart: true, //insert jibbe
-            // pie_3ddepth:"", //insert jibbe
+            // pie_3ddepth: "", //insert jibbe
             // pie_showlabelspercentage: 0,// insert jibbe
             // pie_colors: "", //insert jibbe
-            // column_pointpadding:"", //insert jibbe
-            // column_grouppadding:"", //insert jibbe
-            // column_borderwidth:"", //insert jibbe
-            // column_3ddepth:"", //insert jibbe
+            // column_pointpadding: "", //insert jibbe
+            // column_grouppadding: "", //insert jibbe
+            // column_borderwidth: "", //insert jibbe
+            // column_3ddepth: "", //insert jibbe
             // enable_3d: false, //insert jibbe
             // useUTC: true, //insert jibbe
-            // yAxisGauge:"",// insert jibbe
+            // yAxisGauge: "",// insert jibbe
         },
 
         //IMPLEMENTATION
@@ -356,16 +356,16 @@ require({
             for (var i = 0; i < objs.length; i++) {
                 var newObj = {};
                 var entity = objs[i].getEntity();
-                var entityString = entity.substr(entity.indexOf('.') + 1); // added to have type of geoobject available when plotting
+                var entityString = entity.substr(entity.indexOf(".") + 1); // added to have type of geoobject available when plotting
                 newObj.type = entityString; // first checkref on all generic attributes of geoobject
-                newObj.lowRedBegin = this.checkRef(objs[i], 'lowRedBegin', this.lowRedBegin);
-                newObj.lowRedEnd = this.checkRef(objs[i], 'lowRedEnd', this.lowRedEnd);
+                newObj.lowRedBegin = this.checkRef(objs[i], "lowRedBegin", this.lowRedBegin);
+                newObj.lowRedEnd = this.checkRef(objs[i], "lowRedEnd", this.lowRedEnd);
 
-                newObj.greenBegin = this.checkRef(objs[i], 'greenBegin', this.greenBegin);
-                newObj.greenEnd = this.checkRef(objs[i], 'greenEnd', this.greenEnd);
+                newObj.greenBegin = this.checkRef(objs[i], "greenBegin", this.greenBegin);
+                newObj.greenEnd = this.checkRef(objs[i], "greenEnd", this.greenEnd);
 
-                newObj.highRedBegin = this.checkRef(objs[i], 'highRedBegin', this.highRedBegin);
-                newObj.highRedEnd = this.checkRef(objs[i], 'highRedEnd', this.highRedEnd);
+                newObj.highRedBegin = this.checkRef(objs[i], "highRedBegin", this.highRedBegin);
+                newObj.highRedEnd = this.checkRef(objs[i], "highRedEnd", this.highRedEnd);
 
                 newObj.guid = objs[i].getGuid();
                 newObjs.push(newObj);
@@ -375,7 +375,7 @@ require({
         checkRef: function(obj, attr, nonRefAttr) {
             if (this.splits && this.splits[attr] && this.splits[attr].length > 1) {
                 var subObj = obj.getChildren(this.splits[attr][0]);
-                return (subObj.length > 0) ? subObj[0].get(this.splits[attr][2]) : '';
+                return (subObj.length > 0) ? subObj[0].get(this.splits[attr][2]) : "";
             } else {
                 return obj.get(nonRefAttr);
             }
@@ -475,7 +475,7 @@ require({
 
 
                 // JH: Add to schema to retrieve shadow-y attribute
-                if (serie.splitseries_enabled && serie.splitseries_attribute && serie.splitseries_attribute !== '') {
+                if (serie.splitseries_enabled && serie.splitseries_attribute && serie.splitseries_attribute !== "") {
                     serie.schema.attributes.push(serie.splitseries_attribute);
                 }
 
@@ -594,10 +594,10 @@ require({
                             var sy = false;
                             if (serie.splitseries_enabled) {
                                 // Get the splitattribute value
-                                var sy_val = rawdata[i][2].get(serie.splitseries_attribute); // Richard: added var
-                                var sy_lim = serie.splitseries_value; // Richard: added var
+                                var sy_val = rawdata[i][2].get(serie.splitseries_attribute);
+                                var sy_lim = serie.splitseries_value;
                                 // TODO JH: Possibly insert operator here, e.g. sy_lim sy_operator sy_value
-                                sy = eval('sy_val == sy_lim');
+                                sy = eval("sy_val == sy_lim");
                             }
 
                             var pos;
@@ -839,7 +839,7 @@ require({
                 var date = new Date(value);
                 if (!isNaN(date))
                     return date.toLocaleDateString() + " " + dojo.date.locale.format(date, {
-                        selector: 'time',
+                        selector: "time",
                         timePattern: "HH:mm"
                     }); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
 
@@ -878,13 +878,13 @@ require({
         getFormattedYValue: function(serie, value) {
             if (serie.AddSuffix) {
                 if (this.yunit1prefix === true && value >= 0) {
-                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2)) + '<b> (i)</b>';
+                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2)) + "<b> (i)</b>";
                 } else if (this.yunit1prefix === true && value < 0) {
-                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + Math.abs((dojo.number.round(value, 2))) + '<b> (c)</b>';
+                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + Math.abs((dojo.number.round(value, 2))) + "<b> (c)</b>";
                 } else if (this.yunit1prefix === false && value >= 0) {
-                    return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + '<b> (i)</b>';
+                    return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + "<b> (i)</b>";
                 } else {
-                    return Math.abs((dojo.number.round(value, 2))) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + '<b> (c)</b>';
+                    return Math.abs((dojo.number.round(value, 2))) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + "<b> (c)</b>";
                 }
             } else {
                 if (this.yunit1prefix === true) {
@@ -899,55 +899,55 @@ require({
 
             var format = null;
             switch (this.dateformat) {
-                case 'fulldate':
-                    return date.toLocaleDateString(); /*format = { selector : 'date', datePattern : "y-MM-dd"};*/
-                case 'datetime':
+                case "fulldate":
+                    return date.toLocaleDateString(); /*format = { selector : "date", datePattern : "y-MM-dd"};*/
+                case "datetime":
                     return date.toLocaleDateString() + " " + dojo.date.locale.format(date, {
-                        selector: 'time',
+                        selector: "time",
                         timePattern: "HH:mm"
                     }); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
-                case 'day':
+                case "day":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "EEE d MMM"
                     };
                     break;
-                case 'month':
+                case "month":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "MMM"
                     };
                     break;
-                case 'monthday':
+                case "monthday":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "dd MMM"
                     };
                     break;
-                case 'year':
+                case "year":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "y"
                     };
                     break;
-                case 'yearmonth':
+                case "yearmonth":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "MMM y"
                     };
                     break;
-                case 'daymonthyeartime':
+                case "daymonthyeartime":
                     format = {
-                        selector: 'date',
+                        selector: "date",
                         datePattern: "dd MMM y HH:mm"
-                    }
+                    };
                     break;
-                case 'weekyear':
-                    //format = { selector : 'date', datePattern : "w - y"};
-                    return this.getWeekNr(date) + ' - ' + this.getWeekYear(date);
-                case 'time':
+                case "weekyear":
+                    //format = { selector : "date", datePattern : "w - y"};
+                    return this.getWeekNr(date) + " - " + this.getWeekYear(date);
+                case "time":
                     format = {
-                        selector: 'time',
+                        selector: "time",
                         timePattern: "HH:mm"
                     };
                     break;

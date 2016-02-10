@@ -18,30 +18,30 @@ function(declare) {
         //mapping between the SimpleChart charttype and the HighCharts charttype
         getChartTypeName: function(value) {
             switch (value) {
-                case 'area':
-                    return 'area';
-                    //case 'areaspline': return 'areaspline';
-                case 'bar':
-                    return 'bar';
-                case 'column':
-                    return 'column';
-                case 'line':
-                    return 'line';
-                    //case 'funnel': return 'funnel';
-                case 'pie':
-                    return 'pie';
-                case 'scatter':
-                    return 'scatter';
-                    //case 'gauge': return 'solidgauge';
-                case 'spline':
-                    return 'spline';
-                    //case 'waterfall': return 'waterfall';
-                case 'stackedLine':
-                    return 'area';
-                case 'stackedLBar':
-                    return 'area';
+                case "area":
+                    return "area";
+                    //case "areaspline": return "areaspline";
+                case "bar":
+                    return "bar";
+                case "column":
+                    return "column";
+                case "line":
+                    return "line";
+                    //case "funnel": return "funnel";
+                case "pie":
+                    return "pie";
+                case "scatter":
+                    return "scatter";
+                    //case "gauge": return "solidgauge";
+                case "spline":
+                    return "spline";
+                    //case "waterfall": return "waterfall";
+                case "stackedLine":
+                    return "area";
+                case "stackedLBar":
+                    return "area";
             }
-            return 'line';
+            return "line";
         },
 
         //triggered if an serie needs to be (re) rendered as a result of receiving (new) data.
@@ -254,15 +254,15 @@ function(declare) {
                         // 20151221 Edit Wouter - do not show value in tooltip if isNaN
                         formatter: function() {
                             if (!self.sharedtooltip) {
-                                return '<b>' + this.series.name + '</b><br/>' + this.point.labelx +
-                                    (self.charttype == 'pie' ? ': ' + dojo.number.round(this.percentage, 2) + '%' : (isNaN(this.point.labely) ? "" : ': ' + this.point.labely));
+                                return "<b>" + this.series.name + "</b><br/>" + this.point.labelx +
+                                    (self.charttype === "pie" ? ": " + dojo.number.round(this.percentage, 2) + "%" : (isNaN(this.point.labely) ? "" : ": " + this.point.labely));
                             } else {
                                 var size = this.points.length;
-                                var s = '<b>' + self.getXLabelForValue(this.x) + '</b>';
+                                var s = "<b>" + self.getXLabelForValue(this.x) + "</b>";
                                 for (var i = 0; i < size; i++) {
-                                    s += '<br/>' + this.points[i].point.series.name + ': ';
-                                    s += Highcharts.numberFormat(this.points[i].point.y, 2, '.');
-                                };
+                                    s += "<br/>" + this.points[i].point.series.name + ": ";
+                                    s += Highcharts.numberFormat(this.points[i].point.y, 2, ".");
+                                }
                                 return s;
                             }
                         },
@@ -298,8 +298,8 @@ function(declare) {
                             }
                         },
                         column: {
-                            borderWidth: this.column_borderwidth,
-                            depth: this.column_3ddepth,
+                            // borderWidth: this.column_borderwidth,
+                            // depth: this.column_3ddepth,
                         },
                         bar: {}
                     },

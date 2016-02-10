@@ -7,7 +7,7 @@ dojo.require("SimpleChart.widget.lib.flot.jquery_flot_stack_min");
 
 define(["dojo/_base/declare"],
     function(declare) {
-        "user strict";
+        "use strict";
         return declare(null, {
 
             uninitializeChart: function() {
@@ -19,7 +19,7 @@ define(["dojo/_base/declare"],
 
             //triggered if an serie needs to be (re) rendered as a result of receiving (new) data.
             renderSerie: function(index) {
-                if (this.receivedseries === null)
+                if (!this.receivedseries)
                     this.receivedseries = [];
                 this.receivedseries[index] = true;
 
@@ -118,7 +118,7 @@ define(["dojo/_base/declare"],
                     if (this.enablezoom)
                         this.showWarning("SimpleChart: Flot implementation does not support zooming.");
                     /*		TODO: something like this		options.selection = { mode : "x" };
-                    				jQuery(this.flotNode).bind("plotselected", dojo.hitch(this, function (event, options,  ranges) {
+                    				jQuery(this.flotNode).bind("plotselected", dojo.hitch(this, function (event, options, ranges) {
                     				// do the zooming
                     					options.xaxis.min = ranges.xaxis.from;
                     					options.xaxis.max = ranges.xaxis.to;
@@ -242,7 +242,7 @@ define(["dojo/_base/declare"],
                     position: "absolute",
                     top: y,
                     left: x
-                }, style === null ? {} : style));
+                }, !style ? {} : style));
 
                 dojo.place(span, this.domNode);
                 if (center === "h")
@@ -268,9 +268,9 @@ define(["dojo/_base/declare"],
                         var y = serie.data[j].y;
                         if (this.charttype === "pie") //pie"s data is structered in another way
                             seriedata.push({
-                                label: serie.data[j].labelx,
-                                data: y
-                            });
+                            label: serie.data[j].labelx,
+                            data: y
+                        });
                         else if (this.charttype === "bar") //give bars a small offset
                             seriedata.push([serie.data[j].index + i / (this.series.length + 1), y]);
                         else if (this.charttype === "stackedbar")

@@ -2,11 +2,11 @@
 	SimpleChart
 	========================
 
-	@file      : SimpleChart.js
-	@author    : Michel Weststrate
-	@date      : 09-03-2015
-	@copyright : Mendix
-	@license   : Please contact our sales department.
+	@file		SimpleChart.js
+	@author		Michel Weststrate
+	@date		09-03-2015
+	@copyright	Mendix
+	@license	Please contact our sales department.
 
 	Documentation
 	=============
@@ -16,7 +16,7 @@
 	===========
 
 
-	File is best readable with tabwidth = 2;
+	File is best readable with tabwidth = 4;
 */
 require({
     packages: [{
@@ -26,7 +26,7 @@ require({
     }]
 }, ["dojo/_base/declare", "mxui/widget/_WidgetBase", "mxui/mixin/_Contextable",
     "jquery", "SimpleChart/widget/flot", "SimpleChart/widget/highcharts",
-    "dijit/form/DateTextBox", "dijit/form/NumberTextBox" , "dijit/form/TextBox", "dijit/form/CheckBox", "dijit/form/Button"
+    "dijit/form/DateTextBox", "dijit/form/NumberTextBox", "dijit/form/TextBox", "dijit/form/CheckBox", "dijit/form/Button"
 
 ], function(declare, _WidgetBase, _Contextable, jQuery, Flot, Highcharts, DateTextBox, NumberTextBox, TextBox, CheckBox, Button) {
     "use strict";
@@ -36,92 +36,127 @@ require({
 
         //DECLARATION
         inputargs: {
-            tabindex: 0,
-            wwidth: 400,
-            wheight: 400,
+            // Chart
+            chartprovider: "highcharts",
             charttype: "pie",
+            wwidth: 400,
+            wheight: 800,
             caption: "",
-            polltime: 0,
+            // Chart series - Appearance
             seriesnames: "",
+            seriesyaxis: "",
+            seriescolor: "",
+            // seriescharttype
+            seriesshowpoint: "",
+            //dashStyle: "", //insert jibbe
+            //step: "", //insert jibbe
+            seriesstack: "", //insert jibbe
+            plotonxaxis: false, //insert Wouter
+
+            // Chart series - Entity
             seriesentity: "",
             seriesconstraint: "",
             seriescategory: "",
             seriesvalues: "",
-            seriescolor: "",
-            seriesshowpoint: "",
-            seriesclick: "",
             seriesaggregate: "",
+
+            // Chart series - Interaction
+            seriesclick: "",
+
+            // Chart series - Dynamic series
+            // seriesdynamicserieentity
+            // seriesdynamicserieattribute
+            // seriesdynamicserieconstraint
+
+            // Chart series - Split series
+            splitseries_enabled: false,
+            // splitseries_attribute
+            // splitseries_value
+
+            // Chart - Customizing
+            // seriesextraoptions
+            markerradius: "", //insert Wouter
+            markersymbol: "", //insert Wouter
+            AddSuffix: false, //insert Wouter
+
+            // Chart x axis
             xastitle: "",
-            yastitle: "",
-            yastitle2: "",
-            seriesyaxis: "",
-            enablezoom: false,
-            inverted: false,
-            chartprovider: "flot",
-            extraoptions: "",
-            showlegend: true,
             showxticks: true,
-            showyticks: true,
-            showhover: true,
-            autorefresh: false,
             dateaggregation: "none", // or hour/day/month/year
+            // dateformatXaxis
             dateformat: "",
-            yunit1: "",
-            yunit2: "",
             uselinearscaling: true,
+
+            // Chart y axis
+            yastitle: "",
+            showyticks: true,
+            EnableyAxisMin: false, //insert Wouter
+            yAxisMin: 0, //insert Wouter
+            Absolute: false, //insert Wouter
+            yunit1: "",
+            // yunit1prefix
+            yastitle2: "",
+            yunit2: "",
+
+            // Filter
             constraintentity: "",
             filtername: "",
             filterattr: "",
 
-            // custom inserts
-            debugging: false, //insert jibbe
-            sharedtooltip: false, //insert jibbe
-            exporting: false, //insert jibbe
-            //step: "", //insert jibbe
-            //dashStyle: "", //insert jibbe
-            pie_datalabelsdistance: "", //insert jibbe
-            pie_showdatalabels: "", //insert jibbe
-            pie_semicircledonutchart: true, //insert jibbe
-            pie_3ddepth:"", //insert jibbe
-            pie_showlabelspercentage: 0,// insert jibbe
-            pie_colors: "", //insert jibbe
-            column_pointpadding:"", //insert jibbe
-            column_grouppadding:"", //insert jibbe
-            column_borderwidth:"", //insert jibbe
-            column_3ddepth:"", //insert jibbe
-            enable_3d: false, //insert jibbe
-            useUTC: true, //insert jibbe
-            stacking: "", //insert jibbe
-            seriesstack: "", //insert jibbe
-            yAxisGauge:"",// insert jibbe
-            plotBandEntity:"",
-            lowRedBegin: 0,
-            lowRedEnd: 20,
-            greenBegin: 40,
-            greenEnd: 60,
-            redBegin: 80,
-            redEnd: 100,
-            green: "rgba(139, 195, 74, 0.60)",
-            //green: "rgba(176, 198, 51, 0.60)", //Hortilux nieuwe huisstijl
-            red: "rgba(244, 67, 54, 0.60)",
-            orange: "rgba(255, 152, 0, 0.60)",
-            enablePlotbands: false,
-            Absolute: false, //insert Wouter
-            AddSuffix: false, //insert Wouter
-            plotonxaxis: false, //insert Wouter
-            splitseries_enabled: false,
-            showcrosshairs: false, //insert Wouter
-            markerradius: "", //insert Wouter
-            markersymbol: "", //insert Wouter
-            yAxisMin: 0, //insert Wouter
-            EnableyAxisMin: false, //insert Wouter
+            // Appearance
+            showlegend: true,
+            showhover: true,
+            showcrosshairs: false,
+            enablezoom: false,
+            sharedtooltip: false,
+            autorefresh: false,
+            polltime: 0,
+            inverted: false,
             listentogrid: false,
+            stacking: "", //insert jibbe
+
+            // Plotbands
+            enablePlotbands: false,
+            plotBandEntity: "",
+            highRedEnd: 100,
+            highRedBegin: 80,
+            greenEnd: 60,
+            greenBegin: 40,
+            lowRedEnd: 20,
+            lowRedBegin: 0,
+            green: "rgba(139, 195, 74, 0.60)",
+            // green: "rgba(176, 198, 51, 0.60)", //Hortilux nieuwe huisstijl
+            orange: "rgba(255, 152, 0, 0.60)",
+            red: "rgba(244, 67, 54, 0.60)",
+
+            // Customizing
+            extraoptions: "",
+            debugging: false, //insert jibbe
+
+            // Common
+            tabindex: 0,
+
+            // Other (not used in this version of SimpleChart)
+            // exporting: false, //insert jibbe
+            // pie_datalabelsdistance: "", //insert jibbe
+            // pie_showdatalabels: "", //insert jibbe
+            // pie_semicircledonutchart: true, //insert jibbe
+            // pie_3ddepth:"", //insert jibbe
+            // pie_showlabelspercentage: 0,// insert jibbe
+            // pie_colors: "", //insert jibbe
+            // column_pointpadding:"", //insert jibbe
+            // column_grouppadding:"", //insert jibbe
+            // column_borderwidth:"", //insert jibbe
+            // column_3ddepth:"", //insert jibbe
+            // enable_3d: false, //insert jibbe
+            // useUTC: true, //insert jibbe
+            // yAxisGauge:"",// insert jibbe
         },
 
         //IMPLEMENTATION
         dataobject: null,
         series: null,
-        usecontext: false,
+        usecontext: true,
         chart: null,
         firstrun: true,
         isdate: false, //use dates as x axis?
@@ -131,6 +166,10 @@ require({
         rangeNode: null,
         refreshing: 0,
         refreshSub: null,
+        // contextGuid : null,
+        // splits	: null,
+        // refs : null,
+        // schema : null,
 
         splitprop: function(prop) {
             return this[prop] !== "" ? this[prop].split(";") : [""];
@@ -143,6 +182,7 @@ require({
                 width: this.wwidth + "px",
                 height: this.wheight + "px"
             });
+
             dojo.addClass(this.domNode, "SimpleChartOuter");
 
             //create series object
@@ -192,7 +232,7 @@ require({
         },
 
         start: function() {
-            if (this.polltime > 0 && this.refreshhandle === null)
+            if (this.polltime > 0 && !this.refreshhandle)
                 this.refreshhandle = setInterval(dojo.hitch(this, function() {
                     this.refresh();
                 }), this.polltime * 1000);
@@ -215,7 +255,7 @@ require({
             this.refresh();
         },
 
-        resize: function () {
+        resize: function() {
 
         },
 
@@ -227,13 +267,15 @@ require({
 
             if (context && context.getTrackId() !== "" && this.usecontext) {
                 this.dataobject = context.getTrackId();
+                //this.contextGUID = context.getTrackId();
+                this.getListObjects(this.dataobject);
                 this.hascontext = true;
                 this.refresh();
 
-                if (this.autorefresh){
+                if (this.autorefresh) { // Richard: excluded due to browser console error on "this.dataobject.getGuid()"
                     this.refreshSub = mx.data.subscribe({
-                        guid     : this.dataobject.getGuid(),
-                        callback : dojo.hitch(this, this.objectUpdate)
+                        guid: this.dataobject, //.getGuid(),
+                        callback: dojo.hitch(this, this.objectUpdate)
                     });
                 }
             } else {
@@ -244,113 +286,97 @@ require({
             }
         },
 
+        loadSchema: function(attr, name) {
 
+            if (attr !== "") {
+                this.splits[name] = attr.split("/");
+                if (this.splits[name].length > 1)
+                    if (this.refs[this.splits[name][0]] && this.refs[this.splits[name][0]].attributes) {
+                        this.refs[this.splits[name][0]].attributes.push(this.splits[name][2]);
+                    } else {
+                        this.refs[this.splits[name][0]] = {
+                            attributes: [this.splits[name][2]]
+                        };
+                    }
+                else {
+                    this.schema.push(attr);
+                }
+            }
+        },
+        getListObjects: function(contextguid, callback) {
 
+            var xpathString = "";
+            // TODO JH: Add plotband enabled filter
+            if (contextguid > 0) {
+                xpathString = "//" + this.plotBandEntity + "[id=" + contextguid + "]";
+            } else {
+                xpathString = "//" + this.plotBandEntity;
+            }
+            this.schema = [];
+            this.refs = {};
+            this.splits = [];
 
+            this.loadSchema(this.greenBegin, "greenBegin");
+            this.loadSchema(this.greenEnd, "greenEnd");
+            this.loadSchema(this.lowRedBegin, "lowRedBegin");
+            this.loadSchema(this.lowRedEnd, "lowRedEnd");
+            this.loadSchema(this.highRedBegin, "highRedBegin");
+            this.loadSchema(this.highRedEnd, "highRedEnd");
 
-        loadSchema : function (attr, name) {
+            mx.data.get({
+                xpath: xpathString,
+                filter: {
+                    attributes: this.schema,
+                    references: this.refs
+                },
+                callback: dojo.hitch(this, this.processObjectsList, callback),
+                error: dojo.hitch(this, function(err) {
+                    console.error("SimpleCharts: Unable to retrieve data: " + err);
+                })
+            });
+        },
+        processObjectsList: function(callback, objectsArr) {
+            this.objects = this.parseObjects(objectsArr);
 
-      		if (attr !== '') {
-      			this.splits[name] = attr.split("/");
-      			if (this.splits[name].length > 1)
-      				if (this.refs[this.splits[name][0]] && this.refs[this.splits[name][0]].attributes){
-      					this.refs[this.splits[name][0]].attributes.push(this.splits[name][2]);
-      				}
-      				else {
-      					this.refs[this.splits[name][0]] = {attributes : [this.splits[name][2]]};
-      				}
-      			else {
-      				this.schema.push(attr);
-      			}
-      		}
-      	},
-      	getListObjects : function(contextguid, callback) {
+            this.hascontext = true;
+            this.refresh();
 
-      		var xpathString = '';
-      		//TODO JH: Add plotband enabled filter
-      		if (contextguid > 0){
-      			xpathString = "//" + this.plotBandEntity + "[id=" + contextguid + "]" ;
-      		}
-      		else{
-      			xpathString = "//" + this.plotBandEntity;
-      		}
-      		this.schema = [];
-      		this.refs = {};
+            if (this.autorefresh) {
+                mx.data.subscribe(this, this.dataobject);
+            }
+            if (callback && typeof(callback) === "function") {
+                callback();
+            }
+        },
+        parseObjects: function(objs) {
+            var newObjs = [];
+            for (var i = 0; i < objs.length; i++) {
+                var newObj = {};
+                var entity = objs[i].getEntity();
+                var entityString = entity.substr(entity.indexOf('.') + 1); // added to have type of geoobject available when plotting
+                newObj.type = entityString; // first checkref on all generic attributes of geoobject
+                newObj.lowRedBegin = this.checkRef(objs[i], 'lowRedBegin', this.lowRedBegin);
+                newObj.lowRedEnd = this.checkRef(objs[i], 'lowRedEnd', this.lowRedEnd);
 
-      		this.loadSchema(this.greenBegin, 'greenBegin');
-      		this.loadSchema(this.greenEnd, 'greenEnd');
-      		this.loadSchema(this.lowRedBegin, 'lowRedBegin');
-      		this.loadSchema(this.lowRedEnd, 'lowRedEnd');
-      		this.loadSchema(this.highRedBegin, 'highRedBegin');
-      		this.loadSchema(this.highRedEnd, 'highRedEnd');
+                newObj.greenBegin = this.checkRef(objs[i], 'greenBegin', this.greenBegin);
+                newObj.greenEnd = this.checkRef(objs[i], 'greenEnd', this.greenEnd);
 
-      		// With empty schema whole object is being pushed, this is a temporary fix
-      		// JH: Just give me the whole object
-      		//if (this.schema.length == 0){
-      			//this.schema.push('createdDate');
-      		//}
+                newObj.highRedBegin = this.checkRef(objs[i], 'highRedBegin', this.highRedBegin);
+                newObj.highRedEnd = this.checkRef(objs[i], 'highRedEnd', this.highRedEnd);
 
-      		//JH: disabled dirs
-      		//console.dir(this.schema);
-      		//console.dir(this.refs);
-      		mx.data.get({
-      			xpath       : xpathString,
-      			filter      : {
-      				attributes  : this.schema,
-      				references	: this.refs
-      			},
-      			callback    : dojo.hitch(this, this.processObjectsList, callback),
-      			error       : dojo.hitch(this, function(err) {
-      				console.error("GoogleMapsPolygon: Unable to retrieve data: " + err);
-      			})
-      		});
-
-      	},
-      	processObjectsList : function (callback, objectsArr) {
-
-      		this.objects = this.parseObjects(objectsArr);
-
-      		this.hascontext = true;
-      		this.refresh();
-
-      		if (this.autorefresh){
-      			mx.data.subscribe(this, this.dataobject);
-      		}
-      		if (callback && typeof(callback) == "function"){
-      				callback();
-      		}
-      	},
-      	parseObjects : function (objs) {
-      		var newObjs = [];
-      		for (var i = 0; i < objs.length; i++) {
-      			var newObj = {};
-      			var entity = objs[i].getEntity();
-      			var entityString = entity.substr(entity.indexOf('.')+1);		// added to have type of geoobject available when plotting
-      			newObj['type'] = entityString;									// first checkref on all generic attributes of geoobject
-      			newObj['lowRedBegin'] = this.checkRef(objs[i], 'lowRedBegin', this.lowRedBegin);
-      			newObj['lowRedEnd'] = this.checkRef(objs[i], 'lowRedEnd', this.lowRedEnd);
-
-      			newObj['greenBegin'] = this.checkRef(objs[i], 'greenBegin', this.greenBegin);
-      			newObj['greenEnd'] = this.checkRef(objs[i], 'greenEnd', this.greenEnd);
-
-      			newObj['highRedBegin'] = this.checkRef(objs[i], 'highRedBegin', this.highRedBegin);
-      			newObj['highRedEnd'] = this.checkRef(objs[i], 'highRedEnd', this.highRedEnd);
-
-
-      			newObj['guid'] = objs[i].getGuid();
-      			newObjs.push(newObj);
-
-      		}
-      		return newObjs;
-      	},
-      	checkRef : function (obj, attr, nonRefAttr) {
-      		if (this.splits && this.splits[attr] && this.splits[attr].length > 1) {
-      			var subObj = obj.getChildren(this.splits[attr][0]);
-      			return (subObj.length > 0)?subObj[0].get(this.splits[attr][2]):'';
-      		} else {
-      			return obj.get(nonRefAttr);
-      		}
-      	},
+                newObj.guid = objs[i].getGuid();
+                newObjs.push(newObj);
+            }
+            return newObjs;
+        },
+        checkRef: function(obj, attr, nonRefAttr) {
+            if (this.splits && this.splits[attr] && this.splits[attr].length > 1) {
+                var subObj = obj.getChildren(this.splits[attr][0]);
+                return (subObj.length > 0) ? subObj[0].get(this.splits[attr][2]) : '';
+            } else {
+                return obj.get(nonRefAttr);
+            }
+        },
 
 
 
@@ -408,7 +434,7 @@ require({
             this.refreshing++;
             var serie = this.series[index];
 
-            if (serie.schema === null) {
+            if (!serie.schema) {
                 serie.schema = {
                     attributes: [],
                     references: {},
@@ -446,11 +472,11 @@ require({
 
 
                 // JH: Add to schema to retrieve shadow-y attribute
-          			if (serie.splitseries_enabled && serie.splitseries_attribute && serie.splitseries_attribute != '' ){
-          				serie.schema.attributes.push(serie.splitseries_attribute);
-          			}
+                if (serie.splitseries_enabled && serie.splitseries_attribute && serie.splitseries_attribute !== '') {
+                    serie.schema.attributes.push(serie.splitseries_attribute);
+                }
 
-          		}
+            }
 
 
 
@@ -460,7 +486,7 @@ require({
             var xPath = "//" + serie.seriesentity + this.getActiveConstraint(index) + serie.seriesconstraint.replace(/\[\%CurrentObject\%\]/gi, this.dataobject);
             mx.data.get({
                 xpath: xPath,
-                filter: serie.schema, //TODO: should be schema : serie.schema, but only in 2.5.1 and upward,
+                filter: serie.schema, //TODO: should be schema: serie.schema, but only in 2.5.1 and upward,
                 callback: dojo.hitch(this, this.retrieveData, index),
                 //sort: serie.seriescategory,
                 error: dojo.hitch(this, function(err) {
@@ -473,7 +499,7 @@ require({
             if (attribute.length === 1)
                 return baseObject.metaData;
             var sub = baseObject.getChild(attribute[0]);
-            if (sub === null || sub._guid === 0)
+            if (!sub || sub._guid === 0)
                 throw "Reference to category attribute cannot be empty!";
             return sub.metaData;
         },
@@ -482,8 +508,8 @@ require({
             try {
                 try {
                     var serie = this.series[seriesindex],
-                    valueattr = serie.seriesvalues ? serie.seriesvalues.split("/") : null,
-                    labelattr = serie.seriescategory.split("/");
+                        valueattr = serie.seriesvalues ? serie.seriesvalues.split("/") : null,
+                        labelattr = serie.seriescategory.split("/");
 
                     serie.data = [];
                     var rawdata = []; //[[xvalue, yvalue, originalobject]]
@@ -516,7 +542,7 @@ require({
                             x = this.dateRound(objects[i].get(serie.seriescategory));
                         else {
                             var sub = objects[i].getChild(labelattr[0]);
-                            if (sub === null || sub._guid === 0) {
+                            if (!sub || sub._guid === 0) {
                                 x = "(undefined)";
                             } else {
                                 x = this.dateRound(sub.get(labelattr[2]));
@@ -554,21 +580,21 @@ require({
                                 labelx = mx.parser.formatAttribute(rawdata[i][2], labelattr[0]);
                             else {
                                 var sub = rawdata[i][2].getChild(labelattr[0]);
-                                if (sub === null || sub._guid === 0)
+                                if (sub._guid === 0)
                                     labelx = "(undefined)";
                                 else
                                     labelx = mx.parser.formatAttribute(sub, labelattr[2]);
                             }
 
                             // Determine whether this datapoint requires the secondary style
-                						var sy = false;
-                						if(serie.splitseries_enabled){
-                							// Get the splitattribute value
-                							sy_val = rawdata[i][2].get(serie.splitseries_attribute);
-                							sy_lim = serie.splitseries_value;
-                							// TODO JH: Possibly insert operator here, e.g. sy_lim sy_operator sy_value
-                							sy = eval('sy_val == sy_lim');
-                						}
+                            var sy = false;
+                            if (serie.splitseries_enabled) {
+                                // Get the splitattribute value
+                                var sy_val = rawdata[i][2].get(serie.splitseries_attribute); // Richard: added var
+                                var sy_lim = serie.splitseries_value; // Richard: added var
+                                // TODO JH: Possibly insert operator here, e.g. sy_lim sy_operator sy_value
+                                sy = eval('sy_val == sy_lim');
+                            }
 
                             var pos;
                             if (this.iscategories) {
@@ -584,20 +610,19 @@ require({
                                 }
                             }
 
-                						var yval = "";
-                						var ymin = "";
-                						if (this.EnableyAxisMin){
-                							ymin = this.yAxisMin;
-                						} else if (this.chart){
-                              ymin = this.chart.yAxis[0].getExtremes().min;
-                						}
+                            var yval = "";
+                            var ymin = "";
+                            if (this.EnableyAxisMin) {
+                                ymin = this.yAxisMin;
+                            } else if (this.chart) {
+                                ymin = this.chart.yAxis[0].getExtremes().min;
+                            }
 
-                						if(serie.plotonxaxis) {
-                							yval = ymin;
-                							}
-                							else{
-                							         yval = this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)) : this.aggregate(serie.seriesaggregate, currenty);
-                							}
+                            if (serie.plotonxaxis) {
+                                yval = ymin;
+                            } else {
+                                yval = this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)) : this.aggregate(serie.seriesaggregate, currenty);
+                            }
 
                             var newitem = {
                                 index: this.iscategories ? currentx : serie.data.length,
@@ -607,15 +632,11 @@ require({
                                 //y: this.aggregate(serie.seriesaggregate, currenty)
 
 
-                                origy : this.aggregate(serie.seriesaggregate, currenty),
+                                origy: this.aggregate(serie.seriesaggregate, currenty),
                                 y: yval,
-                  							//y : this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)) : this.aggregate(serie.seriesaggregate, currenty),
-                  							shadowy: sy
-
-
-
+                                //y: this.Absolute ? Math.abs(this.aggregate(serie.seriesaggregate, currenty)): this.aggregate(serie.seriesaggregate, currenty),
+                                shadowy: sy
                             };
-
 
                             // 16112015 - Insert Wouter: origy will not be made absolute and is used in labely
                             newitem.labely = dojo.trim(this.getFormattedYValue(serie, newitem.origy));
@@ -635,9 +656,9 @@ require({
                     }
 
                     //sort
-                    //this.sortdata(seriesindex);
-
-                    //if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
+                    // this.sortdata(seriesindex);
+                    //
+                    // if (dojo.marginBox(this.domNode).h > 0) //bugfix: do not draw if the element is hidden
                     //   this.renderSerie(seriesindex);
 
                     serie.loaded = true;
@@ -758,8 +779,8 @@ require({
         clickCallback: function(serie, itemindex, clientX, clientY) {
             if (this.series[serie].seriesclick) {
                 mx.data.action({
-                    params       : {
-                        actionname : this.series[serie].seriesclick,
+                    params: {
+                        actionname: this.series[serie].seriesclick,
                         applyto: "selection",
                         guids: [this.series[serie].data[itemindex].guid]
                     },
@@ -810,7 +831,16 @@ require({
 
         /** maps a plot X value to a label */
         getXLabelForValue: function(value) {
-            if (this.isdate) {
+            if (this.listentogrid) {
+                var date = new Date(value);
+                if (!isNaN(date))
+                    return date.toLocaleDateString() + " " + dojo.date.locale.format(date, {
+                        selector: 'time',
+                        timePattern: "HH:mm"
+                    }); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
+
+                return "(Undefined)";
+            } else if (this.isdate) {
                 var date = new Date(value);
                 if (!isNaN(date))
                     return this.getFormattedDateTime(date);
@@ -836,100 +866,90 @@ require({
         },
 
         //getFormattedYValue: function(serie, value) {
-          //  return ("" + dojo.number.round(value, 2)) + " " + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2);
+        //  return ("" + dojo.number.round(value, 2)) + " " + (serie.seriesyaxis === true ? this.yunit1: this.yunit2);
         //},
 
 
         // 2015-08-09 - Wouter van Stralen: getFormattedYValue aangepast om unit voor of achter de waarde te plaatsen
-      	getFormattedYValue : function(serie, value) {
-              if (serie.AddSuffix) {
-      			if (this.yunit1prefix === true && value >= 0) {
-      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2))+'<b> (i)</b>';
-      			}
-      			else if (this.yunit1prefix === true && value < 0) {
-      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + Math.abs((dojo.number.round(value, 2)))+'<b> (c)</b>';
-      			}
-      			else if (this.yunit1prefix === false && value >= 0) {
-                      return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2)+'<b> (i)</b>';
-      			}
-      			else {
-      				return Math.abs((dojo.number.round(value, 2))) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2)+'<b> (c)</b>';
-      			}
-      		}
-      		else{
-      			if (this.yunit1prefix === true) {
-      				return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2)) ;
-      			}
-      			else {
-      				return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) ;
-      			}
-      		}
-      	},
-
-
-
-
-
-
-
-
-
+        getFormattedYValue: function(serie, value) {
+            if (serie.AddSuffix) {
+                if (this.yunit1prefix === true && value >= 0) {
+                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2)) + '<b> (i)</b>';
+                } else if (this.yunit1prefix === true && value < 0) {
+                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + Math.abs((dojo.number.round(value, 2))) + '<b> (c)</b>';
+                } else if (this.yunit1prefix === false && value >= 0) {
+                    return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + '<b> (i)</b>';
+                } else {
+                    return Math.abs((dojo.number.round(value, 2))) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + '<b> (c)</b>';
+                }
+            } else {
+                if (this.yunit1prefix === true) {
+                    return (serie.seriesyaxis === true ? this.yunit1 : this.yunit2) + (dojo.number.round(value, 2));
+                } else {
+                    return (dojo.number.round(value, 2)) + (serie.seriesyaxis === true ? this.yunit1 : this.yunit2);
+                }
+            }
+        },
 
         getFormattedDateTime: function(date) {
 
             var format = null;
             switch (this.dateformat) {
-                case "fulldate":
-                    return date.toLocaleDateString(); /*format = { selector : "date", datePattern : "y-MM-dd"};*/
-                case "datetime":
+                case 'fulldate':
+                    return date.toLocaleDateString(); /*format = { selector : 'date', datePattern : "y-MM-dd"};*/
+                case 'datetime':
                     return date.toLocaleDateString() + " " + dojo.date.locale.format(date, {
-                        selector: "time",
+                        selector: 'time',
                         timePattern: "HH:mm"
                     }); /*format = { datePattern : "y-MM-dd", timePattern : "HH:mm"};*/
-                case "day":
+                case 'day':
                     format = {
-                        selector: "date",
-                        datePattern: "EEE"
+                        selector: 'date',
+                        datePattern: "EEE d MMM"
                     };
                     break;
-                case "month":
+                case 'month':
                     format = {
-                        selector: "date",
+                        selector: 'date',
                         datePattern: "MMM"
                     };
                     break;
-                case "monthday":
+                case 'monthday':
                     format = {
-                        selector: "date",
+                        selector: 'date',
                         datePattern: "dd MMM"
                     };
                     break;
-                case "year":
+                case 'year':
                     format = {
-                        selector: "date",
+                        selector: 'date',
                         datePattern: "y"
                     };
                     break;
-                case "yearmonth":
+                case 'yearmonth':
                     format = {
-                        selector: "date",
+                        selector: 'date',
                         datePattern: "MMM y"
                     };
                     break;
-                case "weekyear":
-                    //format = { selector : "date", datePattern : "w - y"};
-                    return this.getWeekNr(date) + " - " + this.getWeekYear(date);
-                case "time":
+                case 'daymonthyeartime':
                     format = {
-                        selector: "time",
+                        selector: 'date',
+                        datePattern: "dd MMM y HH:mm"
+                    }
+                    break;
+                case 'weekyear':
+                    //format = { selector : 'date', datePattern : "w - y"};
+                    return this.getWeekNr(date) + ' - ' + this.getWeekYear(date);
+                case 'time':
+                    format = {
+                        selector: 'time',
                         timePattern: "HH:mm"
                     };
                     break;
                 default:
                     this.showError("Unknown dateformat: " + this.dateformat);
             }
-
-
             return dojo.date.locale.format(date, format);
         },
 
@@ -948,7 +968,6 @@ require({
             date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
             return date.getFullYear();
         },
-
 
         dateRound: function(x) {
             if (!this.isdate || this.dateaggregation === "none")
@@ -987,7 +1006,6 @@ require({
         },
 
         //////// SECTION FILTER IMPLEMENTATION
-
         getActiveConstraint: function(index) {
             if (this.series[index].seriesentity !== this.constraintentity)
                 return "";
@@ -1086,7 +1104,7 @@ require({
 
             //retrieve the type and then construct the inputs
 
-            this.addFilterInputs(mx.meta.getEntity( this.constraintentity));
+            this.addFilterInputs(mx.meta.getEntity(this.constraintentity));
 
         },
 
@@ -1266,7 +1284,7 @@ require({
                 for (var key in filter.value)
                     filter.value[key] = key === this.value;
             }, filter));
-            selectNode["domNode"] = selectNode;
+            selectNode.domNode = selectNode;
             this.inputs.push(selectNode);
         },
 
@@ -1275,14 +1293,14 @@ require({
 
             var widget = new DateTextBox({});
             widget.onChange = dojo.hitch(this, function(filter, value) {
-                filter.value.start = value === null ? null : value.getTime();
+                filter.value.start = !value ? null : value.getTime();
             }, filter);
             dojo.place(widget.domNode, catNode);
             this.inputs.push(widget);
 
             widget = new DateTextBox({});
             widget.onChange = dojo.hitch(this, function(filter, value) {
-                filter.value.end = value === null ? null : value.getTime();
+                filter.value.end = !value ? null : value.getTime();
             }, filter);
             dojo.place(widget.domNode, catNode);
             this.inputs.push(widget);
@@ -1312,7 +1330,7 @@ require({
         },
 
         objectmix: function(base, toadd) {
-            //MWE: because console.dir(dojo.mixin({ a : { b : 3 }}, { a : { c : 5 }})); -> { a : { c : 5 }}, but i want to keep b
+            //MWE: because console.dir(dojo.mixin({ a: { b: 3 }}, { a: { c: 5 }})); -> { a: { c: 5 }}, but i want to keep b
             if (toadd) {
                 /*console.log("in");
                 console.dir(base);
@@ -1322,7 +1340,7 @@ require({
                     if ((key in base) &&
                         ((dojo.isArray(toadd[key]) !== dojo.isArray(base[key])) ||
                             (dojo.isObject(toadd[key]) !== dojo.isObject(base[key]))))
-                        throw "Cannot mix object properties, property '" + key + "' has different type in source and destination object";
+                        throw "Cannot mix object properties, property " + key + " has different type in source and destination object";
 
                     //mix array
                     if (key in base && dojo.isArray(toadd[key])) { //base is checked in the check above

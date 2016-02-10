@@ -1,12 +1,11 @@
 /*global Highcharts*/
-//dojo.provide("SimpleChart.widget.highcharts");
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src"); //or _src
+dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src");
 dojo.require("SimpleChart.widget.lib.highcharts.highcharts-more");
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts-3d"); 
+dojo.require("SimpleChart.widget.lib.highcharts.highcharts-3d");
 
 define(["dojo/_base/declare"],
     function(declare) {
-        "user strict";
+        "use strict";
         return declare(null, {
 
             //free up any resources used by the chart
@@ -19,20 +18,30 @@ define(["dojo/_base/declare"],
             //mapping between the SimpleChart charttype and the HighCharts charttype
             getChartTypeName: function(value) {
                 switch (value) {
-                    case "pie":
-                        return "pie";
-                    case "bar":
-                        return "column";
-                    case "line":
-                        return "line";
-                    case "curve":
-                        return "spline";
-                    case "stackedline":
-                        return "area";
-                    case "stackedbar":
-                        return "area";
+                    case 'area':
+                        return 'area';
+                        //case 'areaspline': return 'areaspline';
+                    case 'bar':
+                        return 'bar';
+                    case 'column':
+                        return 'column';
+                    case 'line':
+                        return 'line';
+                        //case 'funnel': return 'funnel';
+                    case 'pie':
+                        return 'pie';
+                    case 'scatter':
+                        return 'scatter';
+                        //case 'gauge': return 'solidgauge';
+                    case 'spline':
+                        return 'spline';
+                        //case 'waterfall': return 'waterfall';
+                    case 'stackedLine':
+                        return 'area';
+                    case 'stackedLBar':
+                        return 'area';
                 }
-                return "line";
+                return 'line';
             },
 
             //triggered if an serie needs to be (re) rendered as a result of receiving (new) data.
@@ -52,57 +61,50 @@ define(["dojo/_base/declare"],
                     if (this.chart.series[index] !== undefined)
                         this.chart.series[index].setData(data.data, false);
 
-                    //otherwise add a new serie
-                    else
+                    else //otherwise add a new serie
                         this.chart.addSeries(data, false);
 
                     this.chart.redraw();
 
+                    if (this.enablePlotbands) {
+                        // 20150915 Ivo Sturm - Added plotbands settings
+                        if (this.greenColor !== "") {
 
+                            var plotBandOpts = [];
 
-                if (this.enablePlotbands){
-          				// 20150915 Ivo Sturm - Added plotbands settings
-          				if (this.greenColor !== ""){
+                            var plotBandOpts = [{
+                                from: this.objects[0].lowRedBegin,
+                                to: this.objects[0].lowRedEnd,
+                                color: this.red
+                            }, {
+                                from: this.objects[0].lowRedEnd,
+                                to: this.objects[0].greenBegin,
+                                color: this.orange
+                            }, {
+                                from: this.objects[0].greenBegin,
+                                to: this.objects[0].greenEnd,
+                                color: this.green
+                            }, {
+                                from: this.objects[0].greenEnd,
+                                to: this.objects[0].highRedBegin,
+                                color: this.orange
+                            }, {
+                                from: this.objects[0].highRedBegin,
+                                to: this.objects[0].highRedEnd,
+                                color: this.red
+                            }];
 
-          					var plotBandOpts = [];
+                            var axisOptions = {
+                                plotBands: plotBandOpts
+                            };
+                            this.chart.yAxis[0].update(axisOptions);
 
-          					var plotBandOpts = [
-          						{
-          							from: this.objects[0].lowRedBegin,
-          							to: this.objects[0].lowRedEnd,
-          							color: this.red
-          						}, {
-          							from: this.objects[0].lowRedEnd,
-          							to: this.objects[0].greenBegin,
-          							color: this.orange
-          						}, {
-          							from: this.objects[0].greenBegin,
-          							to: this.objects[0].greenEnd,
-          							color: this.green
-          						}, {
-          							from: this.objects[0].greenEnd,
-          							to: this.objects[0].highRedBegin,
-          							color: this.orange
-          						}, {
-          							from: this.objects[0].highRedBegin,
-          							to: this.objects[0].highRedEnd,
-          							color: this.red
-          					}];
+                            //this.chart.yAxis[0].options.plotBands = plotBandOpts;
 
-          					var axisOptions = {plotBands: plotBandOpts};
-          					this.chart.yAxis[0].update(axisOptions);
-
-          					//this.chart.yAxis[0].options.plotBands = plotBandOpts;
-
-          				}
-          			}
-          			this.chart.redraw();
-          		}
-
-
-
-
-              catch (e) {
+                        }
+                    }
+                    this.chart.redraw();
+                } catch (e) {
                     this.showError(" Error while rendering serie " + index + ": " + e);
                     console.error(this.id + " Error while rendering serie " + index + ": " + e, e);
                 }
@@ -132,11 +134,20 @@ define(["dojo/_base/declare"],
                     name: serie.seriesnames,
                     data: serie.data,
                     color: serie.seriescolor,
-                    type: this.getChartTypeName(this.charttype),
+                    //type: this.getChartTypeName(this.charttype),
+                    type: this.getChartTypeName(serie.seriescharttype),
                     showInLegend: this.charttype === "pie" ? false : true,
-                    //yAxis: serie.seriesyaxis == "true" ? 0 : 1 // was getting me trouble
-                    yAxis: 0
+                    splitseries_enabled: serie.splitseries_enabled,
+                    markerradius: serie.markerradius,
+                    markersymbol: serie.markersymbol,
+                    step: serie.step,
+                    dashStyle: serie.dashStyle,
+                    //stack: serie.seriesstack,
                 };
+
+                if (this.debugging) {
+                    console.log(data);
+                }
 
                 //make positions for pie
                 if (this.series.length > 1 && this.charttype === "pie") {
@@ -161,12 +172,14 @@ define(["dojo/_base/declare"],
 
 
                                 // 2015-08-09 - Wouter van Stralen: formatter aangepast om unit voor of achter de waarde te plaatsen
-                          			return self.showyticks ? (self.yunit1prefix ? (self.yunit1 + this.value) : this.value + self.yunit1): "";
+                                return self.showyticks ? (self.yunit1prefix ? (self.yunit1 + this.value) : this.value + self.yunit1) : "";
 
 
                             }
                         },
-                        tickLength: this.showyticks ? 5 : 0
+                        tickLength: this.showyticks ? 5 : 0,
+                        min: this.EnableyAxisMin ? this.yAxisMin : "",
+                        plotBands: [{}, {}, {}]
                     }];
 
                     //create seperate y axises
@@ -188,8 +201,8 @@ define(["dojo/_base/declare"],
                                             //return self.showyticks ? this.value + " " + self.yunit2 : "";
 
 
-                                          // 2015-08-09 - Wouter van Stralen: formatter aangepast om unit voor of achter de waarde te plaatsen
-                                          return self.showyticks ? (self.yunit1prefix ? (self.yunit2 + this.value) : this.value + self.yunit2): "";
+                                            // 2015-08-09 - Wouter van Stralen: formatter aangepast om unit voor of achter de waarde te plaatsen
+                                            return self.showyticks ? (self.yunit1prefix ? (self.yunit2 + this.value) : this.value + self.yunit2) : "";
 
 
                                         }
@@ -199,13 +212,13 @@ define(["dojo/_base/declare"],
                         }
                     }
 
-
                     var options = {
                         credits: {
                             enabled: false
                         },
                         chart: {
                             renderTo: this.domNode,
+                            type: this.charttype !== "other" ? this.charttype : null,
                             zoomType: this.enablezoom ? "x" : null,
                             inverted: this.inverted,
                             width: this.width,
@@ -219,6 +232,7 @@ define(["dojo/_base/declare"],
                                 text: this.xastitle
                             },
                             tickLength: this.showxticks ? 5 : 0,
+                            tickWidth: this.showxticks ? 2 : 0,
                             labels: {
                                 formatter: function() {
                                     if (!self.showxticks)
@@ -233,37 +247,48 @@ define(["dojo/_base/declare"],
                             shared: this.sharedtooltip,
                             crosshairs: this.showcrosshairs,
                             //formatter: function() {
-                            //    return "<b>" + this.series.seriesnames + "</b><br/>" + this.point.labelx + ": " +
-                            //        (self.charttype === "pie" ? dojo.number.round(this.percentage, 2) + "%" : this.point.labely);
+                            //	return "<b>" + this.series.seriesnames + "</b><br/>" + this.point.labelx + ": " +
+                            //		(self.charttype === "pie" ? dojo.number.round(this.percentage, 2) + "%" : this.point.labely);
                             //}
 
 
 
                             // 20151221 Edit Wouter - do not show value in tooltip if isNaN
-                            formatter: function () {
-                              if (!self.sharedtooltip) {
-                                return '<b>'+ this.series.name + '</b><br/>' + this.point.labelx +
-                                              (self.charttype == 'pie' ? ': '+dojo.number.round(this.percentage, 2) + '%' : (isNaN(this.point.labely) ? "" : ': '+this.point.labely));
-                              } else {
-                                var size = this.points.length;
-                                var s = '<b>' + self.getXLabelForValue(this.x) + '</b>';
-                                for(var i = 0; i < size; i++) {
-                                  s += '<br/>' + this.points[i].point.series.name + ': ';
-                                  s += Highcharts.numberFormat(this.points[i].point.y, 2, '.');
-                                };
-                                return s;
-                              }
+                            formatter: function() {
+                                if (!self.sharedtooltip) {
+                                    return '<b>' + this.series.name + '</b><br/>' + this.point.labelx +
+                                        (self.charttype == 'pie' ? ': ' + dojo.number.round(this.percentage, 2) + '%' : (isNaN(this.point.labely) ? "" : ': ' + this.point.labely));
+                                } else {
+                                    var size = this.points.length;
+                                    var s = '<b>' + self.getXLabelForValue(this.x) + '</b>';
+                                    for (var i = 0; i < size; i++) {
+                                        s += '<br/>' + this.points[i].point.series.name + ': ';
+                                        s += Highcharts.numberFormat(this.points[i].point.y, 2, '.');
+                                    };
+                                    return s;
+                                }
                             },
-
-
-
-
                         },
+
+
+
+
+
+
+
                         plotOptions: {
                             series: {
-                                stacking: this.charttype === "stack" ? "normal" : null
+                                //stacking: this.stacking,
+                                //stacking: this.charttype === "stack" ? "normal" : null
+                                enabled: this.showhover,
+                                pointPadding: parseFloat(this.column_pointpadding),
+                                groupPadding: parseFloat(this.column_grouppadding),
                             },
+                            line: {},
+                            spline: {},
+                            area: {},
                             pie: {
+                                //colors: colorsArray,
                                 dataLabels: {
                                     enabled: true,
                                     formatter: function() {
@@ -273,7 +298,12 @@ define(["dojo/_base/declare"],
                                     },
                                     color: "white"
                                 }
-                            }
+                            },
+                            column: {
+                                borderWidth: this.column_borderwidth,
+                                depth: this.column_3ddepth,
+                            },
+                            bar: {}
                         },
                         legend: {
                             enabled: this.showlegend,
@@ -294,4 +324,4 @@ define(["dojo/_base/declare"],
             }
         });
     });
-    //@ sourceURL=widgets/SimpleChart/widget/highcharts.js
+//@ sourceURL=widgets/SimpleChart/widget/highcharts.js

@@ -1,9 +1,10 @@
 /*global Highcharts*/
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts_src");
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts-more");
-dojo.require("SimpleChart.widget.lib.highcharts.highcharts-3d");
-
-define(["dojo/_base/declare"],
+define([
+    "dojo/_base/declare",
+    "SimpleChart/widget/lib/highcharts/highcharts_src",
+    "SimpleChart/widget/lib/highcharts/highcharts-more",
+    "SimpleChart/widget/lib/highcharts/highcharts-3d",
+],
 function(declare) {
     "use strict";
     return declare(null, {
@@ -27,15 +28,18 @@ function(declare) {
                     return "column";
                 case "line":
                     return "line";
-                    //case "funnel": return "funnel";
+                // case "funnel":
+                    // return "funnel";
                 case "pie":
                     return "pie";
                 case "scatter":
                     return "scatter";
-                    //case "gauge": return "solidgauge";
+                // case "gauge":
+                    // return "solidgauge";
                 case "spline":
                     return "spline";
-                    //case "waterfall": return "waterfall";
+                // case "waterfall":
+                    // return "waterfall";
                 case "stackedLine":
                     return "area";
                 case "stackedLBar":

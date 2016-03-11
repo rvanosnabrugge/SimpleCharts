@@ -61,14 +61,12 @@ function(declare) {
                 }
 
                 var data = this.getSeriesData(index);
-                //if the serie was already created, replace its data
+                // if the serie was already created, replace its data
                 if (this.chart.series[index] !== undefined)
                     this.chart.series[index].setData(data.data, false);
 
                 else //otherwise add a new serie
                     this.chart.addSeries(data, false);
-
-                this.chart.redraw();
 
                 if (this.enablePlotbands) {
                     // 20150915 Ivo Sturm - Added plotbands settings
@@ -100,9 +98,6 @@ function(declare) {
                             plotBands: plotBandOpts
                         };
                         this.chart.yAxis[0].update(axisOptions);
-
-                        //this.chart.yAxis[0].options.plotBands = plotBandOpts;
-
                     }
                 }
                 this.chart.redraw();

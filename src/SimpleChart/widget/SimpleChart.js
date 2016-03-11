@@ -230,7 +230,6 @@ require({
             this.createrangeNode();
             this.refreshSub = null;
             //this.loaded();
-            console.dir(this.series);
         },
 
         start: function() {
@@ -288,6 +287,7 @@ require({
         },
 
         loadSchema: function(attr, name) {
+
             if (attr !== "") {
                 this.splits[name] = attr.split("/");
                 if (this.splits[name].length > 1)

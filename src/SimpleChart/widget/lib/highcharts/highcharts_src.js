@@ -2,7 +2,7 @@
 // @compilation_level SIMPLE_OPTIMIZATIONS
 
 /**
- * @license Highcharts JS v4.2.3 (2016-02-08)
+ * @license Highcharts JS v4.2.2 (2016-02-04)
  *
  * (c) 2009-2016 Torstein Honsi
  *
@@ -59,7 +59,7 @@
         charts = [],
         chartCount = 0,
         PRODUCT = 'Highcharts',
-        VERSION = '4.2.3',
+        VERSION = '4.2.2',
 
         // some constants for frequently used strings
         DIV = 'div',
@@ -1533,7 +1533,7 @@
             useUTC: true,
             //timezoneOffset: 0,
             canvasToolsURL: 'http://code.highcharts.com/modules/canvas-tools.js',
-            VMLRadialGradientURL: 'http://code.highcharts.com/4.2.3/gfx/vml-radial-gradient.png'
+            VMLRadialGradientURL: 'http://code.highcharts.com/4.2.2/gfx/vml-radial-gradient.png'
         },
         chart: {
             //animation: true,
@@ -2482,7 +2482,7 @@
                 key,
                 attribs = {},
                 normalizer,
-                strokeWidth = wrapper.strokeWidth || 0;
+                strokeWidth = rect.strokeWidth || wrapper.strokeWidth || 0;
 
             normalizer = mathRound(strokeWidth) % 2 / 2; // mathRound because strokeWidth can sometimes have roundoff errors
 
@@ -3258,13 +3258,7 @@
             return inserted;
         },
         _defaultSetter: function (value, key, element) {
-            try {
-                if (isNaN(value)) {
-                    // parseFloat(value);
-                    // value = 20;
-                }
-                element.setAttribute(key, value);
-            } catch (e) {console.dir(value);}
+            element.setAttribute(key, value);
         }
     };
 
@@ -3963,7 +3957,7 @@
                 };
 
             if (strokeWidth !== UNDEFINED) {
-                wrapper.strokeWidth = strokeWidth;
+                attribs.strokeWidth = strokeWidth;
                 attribs = wrapper.crisp(attribs);
             }
 
@@ -3971,8 +3965,8 @@
                 attribs.r = r;
             }
 
-            wrapper.rSetter = function (value, key, element) {
-                attr(element, {
+            wrapper.rSetter = function (value) {
+                attr(this.element, {
                     rx: value,
                     ry: value
                 });
@@ -10551,9 +10545,9 @@
 
             var chart = this.chart;
 
-            if (!defined(hoverChartIndex) || !charts[hoverChartIndex] || !charts[hoverChartIndex].mouseIsDown) {
+            //if (!defined(hoverChartIndex) || !charts[hoverChartIndex].mouseIsDown) {
                 hoverChartIndex = chart.index;
-            }
+            //}
 
             e = this.normalize(e);
             e.returnValue = false; // #2251, #3224
@@ -12858,9 +12852,8 @@
                         })
                         .add();
                 } else {
-                    plotBorder.strokeWidth = -plotBorderWidth;
                     plotBorder.animate(
-                        plotBorder.crisp({ x: plotLeft, y: plotTop, width: plotWidth, height: plotHeight }) //#3282 plotBorder should be negative
+                        plotBorder.crisp({ x: plotLeft, y: plotTop, width: plotWidth, height: plotHeight, strokeWidth: -plotBorderWidth }) //#3282 plotBorder should be negative
                     );
                 }
             }
@@ -13371,8 +13364,8 @@
 
             // If no x is set by now, get auto incremented value. All points must have an
             // x value, however the y value can be null to create a gap in the series
-            if (typeof point.x !== 'number' && series) {
-                point.x = x === undefined ? series.autoIncrement() : x;
+            if (point.x === UNDEFINED && series) {
+                point.x = x === UNDEFINED ? series.autoIncrement() : x;
             }
 
             return point;
@@ -14358,8 +14351,8 @@
         /**
          * Return the series points with null points filtered out
          */
-        getValidPoints: function (points) {
-            return grep(points || this.points, function (point) {
+        getValidPoints: function () {
+            return grep(this.points, function (point) {
                 return !point.isNull;
             });
         },
@@ -14818,27 +14811,10 @@
             var series = this,
                 options = series.options,
                 step = options.step,
-                reversed,
                 graphPath = [],
                 gap;
 
             points = points || series.points;
-
-            // Bottom of a stack is reversed
-            reversed = points.reversed;
-            if (reversed) {
-                points.reverse();
-            }
-            // Reverse the steps (#5004)
-            step = { right: 1, center: 2 }[step] || (step && 3);
-            if (step && reversed) {
-                step = 4 - step;
-            }
-
-            // Remove invalid points, especially in spline (#5015)
-            if (options.connectNulls && !nullsAsZeroes && !connectCliffs) {
-                points = this.getValidPoints(points);
-            }
 
             // Build the line
             each(points, function (point, i) {
@@ -14871,14 +14847,14 @@
 
                     } else if (step) {
 
-                        if (step === 1) { // right
+                        if (step === 'right') {
                             pathToPoint = [
                                 L,
                                 lastPoint.plotX,
                                 plotY
                             ];
 
-                        } else if (step === 2) { // center
+                        } else if (step === 'center') {
                             pathToPoint = [
                                 L,
                                 (lastPoint.plotX + plotX) / 2,
@@ -15351,7 +15327,11 @@
 
             // Start the recursive build process with a clone of the points array and null points filtered out (#3873)
             function startRecursive() {
-                series.kdTree = _kdtree(series.getValidPoints(), dimensions, dimensions);
+                var points = grep(series.points || [], function (point) { // #4390
+                    return point.y !== null;
+                });
+
+                series.kdTree = _kdtree(points, dimensions, dimensions);
             }
             delete series.kdTree;
 
@@ -16584,8 +16564,7 @@
 
             topPath = getGraphPath.call(this, graphPoints, true, true);
 
-            bottomPoints.reversed = true;
-            bottomPath = getGraphPath.call(this, bottomPoints, true, true);
+            bottomPath = getGraphPath.call(this, bottomPoints.reverse(), true, true);
             if (bottomPath.length) {
                 bottomPath[0] = L;
             }
@@ -16681,18 +16660,16 @@
                     lastY = lastPoint.plotY,
                     nextX = nextPoint.plotX,
                     nextY = nextPoint.plotY,
-                    correction = 0;
+                    correction;
 
                 leftContX = (smoothing * plotX + lastX) / denom;
                 leftContY = (smoothing * plotY + lastY) / denom;
                 rightContX = (smoothing * plotX + nextX) / denom;
                 rightContY = (smoothing * plotY + nextY) / denom;
 
-                // Have the two control points make a straight line through main point
-                if (rightContX !== leftContX) { // #5016, division by zero
-                    correction = ((rightContY - leftContY) * (rightContX - plotX)) /
-                        (rightContX - leftContX) + plotY - rightContY;
-                }
+                // have the two control points make a straight line through main point
+                correction = ((rightContY - leftContY) * (rightContX - plotX)) /
+                    (rightContX - leftContX) + plotY - rightContY;
 
                 leftContY += correction;
                 rightContY += correction;

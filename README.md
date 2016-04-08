@@ -1,6 +1,10 @@
 The Mendix SimpleCharts widget.
 ============
 
+> **This widget is based on a legacy library and is considered deprecated. It is not actively supported. It might work in Mendix 6, but it is not stable. If you want to contribute to the widget, or actively maintain it, please contact us!**
+>
+> **Please use the ChartJS widget ([AppStore](https://appstore.home.mendix.com/link/app/1712/Mendix/ChartJS-Widget)/[Github](https://github.com/mendix/ChartJS)) for chart requirements in your project.**
+
 The simple chart widget allows to rapidly create charts using the Modeler. The widget is designed to be easy to configure and should be up and running.
 
 -   Multiple chart rendering algorithms

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" ?> <widget
-id="SimpleChart.widget.SimpleChart" needsEntityContext="false"
-xmlns="http://www.mendix.com/widget/1.0/">
-  <name>Simple Chart</name> <description></description>
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="SimpleChart.widget.SimpleChart" needsEntityContext="false" xmlns="http://www.mendix.com/widget/1.0/">
+	<name>Simple Chart</name>
+	<description></description>
 
-  <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0
+	<icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0
 U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJYSURBVDjLY/j//z8DJRhMmJQd+x89/W4I
 RQbY1x5L8590dzmy5PuIqC4gfvA+PPIyEMfhNqD06H+L9gfG9p33/jr23OMEiX30DTj8yT/oFxCf
 +hAYfBeIfwPxIyBWwjSg5Mh/tYZHzDr1D34aND7Y9tXOsf2Lg/O/z85uNjCFn908lT56eH985xXw
@@ -17,113 +17,173 @@ IHmga6XgBujl7vw/R1TDAabZscNommOn0UeHLsNFDj2GPDBxh37DDrtJ+u8x0oFu9vb/liU6khal
 OoHZRvnqUhpROhmmxRo8cAO0M7f8187Y/F8rYxMQb/yvlbYBiNf/1wTh1HX/NUA4ZS0Ur/mvkbwa
 jOEGUIIBf5BxjDvwFIUAAAAASUVORK5CYII=</icon>
 
-    <properties>
-        <property key="wheight" type="string" defaultValue="300">
-            <caption>Height</caption>
-            <category>Appearance</category>
-            <description>Height of the widget (e.g. 300px or 100%).</description>
-        </property>
-        <property key="wwidth" type="string" defaultValue="100%">
-            <caption>Width</caption>
-            <category>Appearance</category>
-            <description>Width of the widget (e.g. 300px or 100%).</description>
-        </property>
-
-        <property key="chartprovider" type="enumeration" defaultValue="flot" required="true">
-            <caption>Chart implementation</caption>
-            <category>Chart</category>
-            <description>Chart rendering engine. Either Flot (free) or Highcharts.com (non free). The latter one supports more features but requires a license for non-commercial use. See http://www.highcharts.com/license for more details. So without a proper license one is not free to use the 'highcarts' settings. </description>
-            <enumerationValues>
-                <enumerationValue key="flot">Flot (FREE)</enumerationValue>
-                <enumerationValue key="highcharts">Highcharts.com (NON FREE)</enumerationValue>
-            </enumerationValues>
-        </property>
-        <property key="charttype" type="enumeration" defaultValue="line" required="true">
-            <caption>Chart type</caption> <category>Chart</category>
-            <description> Which kind of chart to display. Stacked is a line based graph, which sums up all series. Curve generates a smooth graph and is only supported by the Highcharts implementation.
-            </description>
-            <enumerationValues>
-                <enumerationValue key="pie">Pie</enumerationValue>
-                <enumerationValue key="bar">Bar</enumerationValue>
-                <enumerationValue key="line">Line</enumerationValue>
-                <enumerationValue key="curve">Curve</enumerationValue>
-                <enumerationValue key="stackedline">Stacked Line</enumerationValue>
-                <enumerationValue key="stackedbar">Stacked Bar</enumerationValue>
-            </enumerationValues>
-        </property>
-        <property key="caption" type="string" defaultValue="" required="false">
-            <caption>Chart caption</caption>
-            <category>Chart</category>
-            <description>Caption of the chart. </description>
-        </property>
-        <property key="doesnotmatter2" type="object" isList="true" required="true">
-            <caption>Chart Series</caption>
-            <category>Chart</category>
-            <description></description>
-            <properties>
-                <property key="seriesnames" type="string" defaultValue="" required="true">
-                    <caption>Name</caption>
-                    <category>Appearance</category>
-                    <description>The label of this serie</description>
-                </property>
-                <property key="seriesentity" type="entity" required="true">
-                    <caption>Entity</caption>
-                    <category>Data source</category>
-                    <description>The object which represents a single point in this serie</description>
-                </property>
-                <property key="seriesconstraint" type="entityConstraint" entityProperty="seriesentity" required="false">
-                    <caption>Constraint</caption>
-                    <category>Data source</category>
-                    <description>Constrain the objects to be shown.</description>
-                </property>
-                
-                <property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
-                    <caption>Category (x)</caption> <category>Data source</category>
-                    <description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here.
-Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.
-                    </description>
-                    <attributeTypes>
-                        <attributeType name="AutoNumber"/>
-                        <attributeType name="Boolean"/>
-                        <attributeType name="Currency"/>
-                        <attributeType name="DateTime"/>
-                        <attributeType name="Enum"/>
-                        <attributeType name="Float"/>
-                        <attributeType name="Integer"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="String"/>
-                    </attributeTypes>
-                </property>
-                      
-                <property key="seriesvalues" type="attribute" entityProperty="seriesentity" required="false" isPath="optional" pathType="referenceSet">
-                    <!-- note that pathType reference or referenceSet is
-                    indifferent for the widget, however the modeler does not
-                    support a 'both' property, so we use the most generic one
-                    -->
-                    <caption>Value (y)</caption>
-                    <category>Data source</category>
-                    <description>
-The attribute which specifies the (Y) value of a point in the chart. Should be a numeric value. 
-If a reference set is used, the aggregate function will be applied. 
-If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case.
-                    </description>
-                    <attributeTypes>
-                        <attributeType name="AutoNumber" />
-                        <attributeType name="Float" />
-                        <attributeType name="Currency" />
-                        <attributeType name="Integer" />
-                        <attributeType name="Long" />
-                    </attributeTypes>
-                </property>
-                <property key="seriesyaxis" type="boolean" defaultValue="true">
-                    <caption>Use primary Y axis</caption>
-                    <category>Appearance</category>
-                    <description>If true, this serie uses the primary Y axis. If false, this serie uses the secondary Y axis, which has its own range. For the first serie, this value should always be true.</description>
-                </property>
-                <property key="seriesaggregate" type="enumeration" defaultValue="sum" required="true">
-                    <caption>Aggregate function</caption>
-                    <category>Data source</category>
-                    <description>Defines how data is aggregated when multiple Y values are available for a single X value.
+	<properties>
+		<!-- Chart -->
+		<property key="chartprovider" type="enumeration" defaultValue="highcharts" required="true">
+			<caption>Chart implementation</caption>
+			<category>Chart</category>
+			<description>Chart rendering engine. Either Flot (free) or Highcharts.com (non free). The latter one supports more features but requires a license for non-commercial use. See http://www.highcharts.com/license for more details. So without a proper license one is not free to use the 'highcarts' settings.</description>
+			<enumerationValues>
+				<enumerationValue key="flot">Flot (FREE)</enumerationValue>
+				<enumerationValue key="highcharts">Highcharts.com (NON FREE)</enumerationValue>
+			</enumerationValues>
+		</property>
+		<property key="charttype" type="enumeration" defaultValue="line" required="true">
+			<caption>Chart type</caption>
+			<category>Chart</category>
+			<description>Check http://api.highcharts.com/highcharts#plotOptions for explanation.</description>
+			<enumerationValues>
+				<enumerationValue key="pie">Pie</enumerationValue>
+				<enumerationValue key="scatter">Scatter</enumerationValue>
+				<enumerationValue key="column">Column</enumerationValue>
+				<enumerationValue key="bar">Bar</enumerationValue>
+				<enumerationValue key="area">Area</enumerationValue>
+				<enumerationValue key="line">Line</enumerationValue>
+				<enumerationValue key="stackedLine">Stacked line</enumerationValue>
+				<enumerationValue key="stackedBar">Stacked bar</enumerationValue>
+				<enumerationValue key="other">Other or combinations (define type in chart series)</enumerationValue>
+			</enumerationValues>
+		</property>
+		<property key="wheight" type="string" defaultValue="400px">
+			<caption>Height</caption>
+			<category>Chart</category>
+			<description>Height of the widget (e.g. 400px or 100%).</description>
+		</property>
+		<property key="wwidth" type="string" defaultValue="100%">
+			<caption>Width</caption>
+			<category>Chart</category>
+			<description>Width of the widget (e.g. 800px or 100%).</description>
+		</property>
+		<property key="caption" type="string" defaultValue="" required="false">
+			<caption>Chart caption</caption>
+			<category>Chart</category>
+			<description>Caption of the chart. </description>
+		</property>
+		<property key="doesnotmatter2" type="object" isList="true" required="true">
+			<caption>Chart series</caption>
+			<category>Chart</category>
+			<description></description>
+			<properties>
+				<!-- Chart series - Appearance -->
+				<property key="seriesnames" type="string" defaultValue="" required="true">
+					<caption>Name</caption>
+					<category>Appearance</category>
+					<description>The label of this serie</description>
+				</property>
+				<!-- Chart series - Data source (1/2) -->
+				<property key="seriesentity" type="entity" required="true">
+					<caption>Entity</caption>
+					<category>Data source</category>
+					<description>The object which represents a single point in this serie</description>
+				</property>
+				<property key="seriesconstraint" type="entityConstraint" entityProperty="seriesentity" required="false">
+					<caption>Constraint</caption>
+					<category>Data source</category>
+					<description>Constrain the objects to be shown.</description>
+				</property>
+				<property key="serieslimitamount" type="boolean" defaultValue="false">
+					<caption>Limit amount</caption>
+					<category>Data source</category>
+					<description>Limit the amount of data points to be shown.</description>
+				</property>
+				<property key="serieslimitamountvalue" type="integer" defaultValue="100" required="true">
+					<caption>Limit amount value</caption>
+					<category>Data source</category>
+					<description>The amount of data points to be shown.</description>
+				</property>
+				<!-- Continue with "Chart series - Appearance" -->
+				<property key="seriesyaxis" type="boolean" defaultValue="true">
+					<caption>Use primary y axis</caption>
+					<category>Appearance</category>
+					<description>If true, this serie uses the primary y axis. If false, this serie uses the secondary y axis, which has its own range. For the first serie, this value should always be true.</description>
+				</property>
+				<property key="seriescolor" type="string" defaultValue="" required="false">
+					<caption>Color</caption>
+					<category>Appearance</category>
+					<description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
+				</property>
+				<property key="seriescharttype" type="enumeration" defaultValue="spline" required="true">
+					<caption>Serie type</caption>
+					<category>Appearance</category>
+					<description> Check http://api.highcharts.com/highcharts#series.type for descriptions on the serie types.</description>
+					<enumerationValues>
+						<enumerationValue key="area">Area</enumerationValue>
+						<enumerationValue key="areaspline">Areaspline</enumerationValue>
+						<enumerationValue key="bar">Bar</enumerationValue>
+						<enumerationValue key="column">Column</enumerationValue>
+						<enumerationValue key="line">Line</enumerationValue>
+						<enumerationValue key="pie">Pie</enumerationValue>
+						<!-- <enumerationValue key="gauge">Gauge</enumerationValue> -->
+						<enumerationValue key="scatter">Scatter</enumerationValue>
+						<enumerationValue key="spline">Spline</enumerationValue>
+						<!-- <enumerationValue key="funnel">Funnel</enumerationValue> -->
+						<!-- <enumerationValue key="bubble">Bubble</enumerationValue> -->
+					</enumerationValues>
+				</property>
+				<property key="seriesshowpoint" type="boolean" defaultValue="false">
+					<caption>Show line points</caption>
+					<category>Appearance</category>
+					<description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
+				</property>
+				<property key="dashStyle" type="string" defaultValue="solid">
+					<caption>Dash style</caption>
+					<category>Appearance</category>
+					<description>A name for the dash style to use for the graph. Applies only to series type having a graph, like line, spline, area and scatter in case it has a lineWidth. </description>
+				</property>
+				<property key="step" type="boolean" defaultValue="false">
+					<caption>Step</caption>
+					<category>Appearance</category>
+					<description>Whether to apply steps to the line. Possible values are left, center and right. Prior to 2.3.5, only left was supported. Defaults to false. </description>
+				</property>
+				<property key="seriesstack" type="integer" defaultValue="1" required="true">
+					<caption>Stack</caption>
+					<category>Appearance</category>
+					<description>This option allows grouping series in a stacked chart. The stack option can be a string or a number or anything else, as long as the grouped series' stack options match each other.</description>
+				</property>
+				<property key="plotonxaxis" type="boolean" defaultValue="false">
+					<caption>Plot value on x axis</caption>
+					<category>Appearance</category>
+					<description>Set to true when you want to plot the point on the x axis.</description>
+				</property>
+				<!-- Chart series - Data source (2/2) -->
+				<property key="seriescategory" type="attribute" entityProperty="seriesentity" required="true" isPath="optional" pathType="reference">
+					<caption>Category (x)</caption>
+					<category>Data source</category>
+					<description>The attribute which specifies the categorie or X value of a point in the chart. References are allowed here. Note that all series should use a Category that correlate with eachother. Otherwise the X-axis might contain undesired values.</description>
+					<attributeTypes>
+						<attributeType name="AutoNumber"/>
+						<attributeType name="Boolean"/>
+						<attributeType name="Currency"/>
+						<attributeType name="DateTime"/>
+						<attributeType name="Enum"/>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+						<attributeType name="Long"/>
+						<attributeType name="String"/>
+					</attributeTypes>
+				</property>
+				<property key="seriesvalues" type="attribute" entityProperty="seriesentity" required="false" isPath="optional" pathType="referenceSet">
+					<!-- note that pathType reference or referenceSet is
+					indifferent for the widget, however the modeler does not
+					support a 'both' property, so we use the most generic one
+					-->
+					<caption>Value (y)</caption>
+					<category>Data source</category>
+					<description>If a reference set is used, the aggregate function will be applied. If not defined, the value '1' will be used. Note that an aggregate function is strongly advised in that case.</description>
+					<attributeTypes>
+						<attributeType name="AutoNumber" />
+						<attributeType name="Float" />
+						<attributeType name="Decimal"/>
+						<attributeType name="Currency" />
+						<attributeType name="Integer" />
+						<attributeType name="Long" />
+					</attributeTypes>
+				</property>
+				<property key="seriesaggregate" type="enumeration" defaultValue="sum" required="true">
+					<caption>Aggregate function</caption>
+					<category>Data source</category>
+					<description>Defines how data is aggregated when multiple Y values are available for a single X value.
 
 Sum: Adds up the Y values and plot it on X.
 
@@ -138,106 +198,192 @@ First only: Only take the first value available, ignore the others.
 Last only: Only take the last value available, ignore the others. Usefull
 to only display the 'current' state.
 
-Log of the Sum: First sums, that takes the Log of that value.                    
-                </description>
-                <enumerationValues>
-                    <enumerationValue key="sum">Sum</enumerationValue>
-                    <enumerationValue key="count">Count</enumerationValue>
-                    <enumerationValue key="avg">Average</enumerationValue>
-                    <enumerationValue key="max">Maximum</enumerationValue>
-                    <enumerationValue key="min">Minimum</enumerationValue>
-                    <enumerationValue key="none">Plot individual points</enumerationValue>
-                    <enumerationValue key="first">First only</enumerationValue>
-                    <enumerationValue key="last">Last only</enumerationValue>
-                    <enumerationValue key="logsum">Log of the Sum</enumerationValue>
-                </enumerationValues>
-                </property>
-                <property key="seriescolor" type="string" defaultValue="" required="false">
-                    <caption>Color</caption>
-                    <category>Appearance</category>
-                    <description>Specifies a color for this serie. This color should be a valid css color. (for example: 'red', '#ff000' or rgb(255,0,0) are all valid). If empty, a default color will be assigned.</description>
-                </property>
-                <property key="seriesshowpoint" type="boolean" defaultValue="false">
-                    <caption>Show Line points </caption>
-                    <category>Appearance</category>
-                    <description>If we have a line chart, indicates if points should be shown within the line for each item.</description>
-                </property>
-                <property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
-                    <caption>On click</caption>
-                    <category>Interaction</category>
-                    <description>This microflow will be invoked when a specific point of this serie is clicked. If an aggregation function is used, the onclick is triggered for the first object usedin the aggregation.</description>
-                    <returnType type="Void"/>
-                </property>
-                <property key="seriesextraoptions" type="string" defaultValue="" required="false" multiline="true">
-                    <caption>Extra options</caption>
-                    <category>Appearance</category>
-                    <description>
-This property can be used to add additional options for the serie, this option is implementation specific and has only been tested with Flot.
-For Flot see: https://github.com/flot/flot/blob/master/API.md
+Log of the Sum: First sums, that takes the Log of that value.
+				</description>
+				<enumerationValues>
+					<enumerationValue key="sum">Sum</enumerationValue>
+					<enumerationValue key="count">Count</enumerationValue>
+					<enumerationValue key="avg">Average</enumerationValue>
+					<enumerationValue key="max">Maximum</enumerationValue>
+					<enumerationValue key="min">Minimum</enumerationValue>
+					<enumerationValue key="none">Plot individual points</enumerationValue>
+					<enumerationValue key="first">First only</enumerationValue>
+					<enumerationValue key="last">Last only</enumerationValue>
+					<enumerationValue key="logsum">Log of the Sum</enumerationValue>
+				</enumerationValues>
+				</property>
+				<!-- Chart series - Interaction -->
+				<property key="seriesclick" type="microflow" required="false" entityProperty="seriesentity">
+					<caption>On click</caption>
+					<category>Interaction</category>
+					<description>This microflow will be invoked when a specific point of this serie is clicked. If an aggregation function is used, the onclick is triggered for the first object usedin the aggregation.</description>
+					<returnType type="Void"/>
+				</property>
+				<!-- Chart series - Dynamic series -->
+				<property key="seriesdynamicserieentity" type="entity" entityProperty="seriesentity" required="false" isPath="yes" pathType="reference">
+					<caption>Series entity</caption>
+					<category>Dynamic series</category>
+					<description>The object which represents a single point in this serie.</description>
+				</property>
+				<property key="seriesdynamicserieattribute" type="attribute" entityProperty="seriesdynamicserieentity" required="false" isPath="optional" pathType="reference">
+					<caption>Series attribute</caption>
+					<category>Dynamic series</category>
+					<description>When using Dynamic Series, which entity or attribute is determining the unique nr of series.</description>
+					<attributeTypes>
+						<attributeType name="AutoNumber"/>
+						<attributeType name="Boolean"/>
+						<attributeType name="Currency"/>
+						<attributeType name="Enum"/>
+						<attributeType name="Float"/>
+						<attributeType name="Integer"/>
+						<attributeType name="Long"/>
+						<attributeType name="String"/>
+					</attributeTypes>
+				</property>
+				<property key="seriesdynamicserieconstraint" type="entityConstraint" entityProperty="seriesdynamicserieentity" required="false">
+					<caption>Series constraint</caption>
+					<category>Dynamic series</category>
+					<description>If you want to limit the nr of series, add the constraint in here, even if it is the same constraint as the datapoints.</description>
+				</property>
+				<!-- Chart series - Split series -->
+				<property key="splitseries_enabled" type="boolean" defaultValue="false">
+					<caption>Enabled</caption>
+					<category>Split series</category>
+					<description></description>
+				</property>
+				<property key="splitseries_attribute" type="attribute" required="false" entityProperty="seriesentity">
+					<caption>Attribute</caption>
+					<category>Split series</category>
+					<description>The attribute used to split the series.</description>
+				<attributeTypes>
+					<attributeType name="String"/>
+					<attributeType name="Integer"/>
+					<attributeType name="Long"/>
+					<attributeType name="Decimal"/>
+					<attributeType name="Float"/>
+				</attributeTypes>
+				</property>
+					<property key="splitseries_value" type="string" required="false">
+						<caption>Attribute value</caption>
+						<category>Split series</category>
+				<description>When the attribute has this value, both line and data point will be dashed.</description>
+				</property>
+				<!-- Chart - Customizing -->
+				<property key="seriesextraoptions" type="string" defaultValue="" required="false" multiline="true">
+					<caption>Extra options</caption>
+					<category>Customizing</category>
+					<description>This property can be used to add additional options for the serie, this option is implementation specific and has only been tested with Flot. See: https://github.com/flot/flot/blob/master/API.md.
 
-Example: to override the default chart type and show this serie as a line instead of a bar specify:
-for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#5A4CD0","#36CAA1"] } " </description>
-                </property>
-                
-                <property key="seriesdynamicserieentity" type="entity" entityProperty="seriesentity" required="false" isPath="yes" pathType="reference">
-                    <caption>Serie Entity</caption>
-                    <category>Dynamic Series</category>
-                    <description>The object which represents a single point in this serie</description>
-                </property>
-                <property key="seriesdynamicserieattribute" type="attribute" entityProperty="seriesdynamicserieentity" required="false" isPath="optional" pathType="reference">
-                    <caption>Serie Attribute</caption>
-                    <category>Dynamic Series</category>
-                    <description>When using Dynamic Series, which entity or attribute is determining the unique nr of series. 
-                    </description>
-                    <attributeTypes>
-                        <attributeType name="AutoNumber"/>
-                        <attributeType name="Boolean"/>
-                        <attributeType name="Currency"/>
-                        <attributeType name="Enum"/>
-                        <attributeType name="Float"/>
-                        <attributeType name="Integer"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="String"/>
-                    </attributeTypes>
-                </property>
-                <property key="seriesdynamicserieconstraint" type="entityConstraint" entityProperty="seriesdynamicserieentity" required="false">
-                    <caption>Serie Constraint</caption>
-                    <category>Dynamic Series</category>
-                    <description>When using a Dynamic Serie if you want to limit the nr of series, add the constraint in here, even if it is the same constraint as the datapoints.</description>
-                </property>
-            </properties>
-        </property>
-        
-        
-        <property key="xastitle" type="string" defaultValue="" required="false">
-            <caption>X axis label</caption>
-            <category>Chart X Axis</category>
-            <description>Label of the X axis.</description>
-        </property>
-        <property key="dateaggregation" type="enumeration" defaultValue="day" required="true">
-            <caption>Date aggregation</caption>
-            <category>Chart X Axis</category>
-            <description>
-Use this field to determine in which time interval data should be aggregated. Use 'No aggregation' if events on different timestamps (in milliseconds) should be displayed as unique points. Use 'Hour' if all data within the same hour should be aggregated, etc.
-
-The aggregation function of the individual series is applied. Usually 'count' or 'sum' are the most useful options. Note that this options influences datetime based series only.
-            </description>
-            <enumerationValues>
-                <enumerationValue key="none">No aggregation</enumerationValue>
-                <enumerationValue key="hour">Per hour</enumerationValue>
-                <enumerationValue key="day">Per day</enumerationValue>
-                <enumerationValue key="week">Per week</enumerationValue>
-                <enumerationValue key="month">Per month</enumerationValue>
-                <enumerationValue key="year">Per year</enumerationValue>
-            </enumerationValues>
-        </property>
-        <property key="dateformat" type="enumeration" defaultValue="fulldate" required="true">
-            <caption>Date formatting</caption> <category>Chart X Axis</category>
-            <description>
-                The date format which should be used if applicable.
-            </description>
-            <enumerationValues>
-                <enumerationValue key="fulldate">Full date</enumerationValue>
+Example: to override the default chart type and show this serie as a line instead of a bar specify: for Flot: "{ lines: { show: true } ,bars: { show: false }, colors: ["#4280CA","#5A4CD0","#36CAA1"] } " </description>
+				</property>
+				<property key="markerradius" type="integer" defaultValue="3" required="true">
+					<caption>Marker radius</caption>
+					<category>Customizing</category>
+					<description>This option allows to set de radius of the marker (in px).</description>
+				</property>
+				<property key="markersymbol" type="string" defaultValue="circle" required="true">
+					<caption>Marker symbol</caption>
+					<category>Customizing</category>
+					<description>This option allows to set de symbol of the marker. Possible options are: "circle", "square", "diamond", "triangle" and "triangle-down". Another option is to add url(https://www.highcharts.com/samples/graphics/sun.png) with any url you want.</description>
+				</property>
+				<property key="AddSuffix" type="boolean" defaultValue="false">
+					<caption>Add suffix</caption>
+					<category>Customizing</category>
+					<description>Whether to add the suffix (c) of (i) to the tooltip</description>
+				</property>
+				<!-- Chart - Zones -->
+				<property key="enableZones" type="boolean" defaultValue="false">
+					<caption>Enable zones</caption>
+					<category>Zones</category>
+					<description>This will enable the possibility to have line coloring based on zones</description>
+				</property>
+				<property key="zoneEntity" type="entity" required="false">
+					<caption>Zone entity </caption>
+					<category>Zones</category>
+					<description>The entity that holds the zone information</description>
+				</property>
+				<property key="zoneLowGreenEnd" type="attribute" entityProperty="zoneEntity" required="false">
+					<caption>zoneLowGreenEnd</caption>
+					<category>Zones</category>
+					<description>The attribute that specifies the maximum of the low green value</description>
+					<attributeTypes>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+					</attributeTypes>
+				</property>
+				<property key="zoneLowOrangeEnd" type="attribute" entityProperty="zoneEntity" required="false">
+					<caption>zoneLowOrangeEnd</caption>
+					<category>Zones</category>
+					<description>The attribute that specifies the maximum of the low orange value</description>
+					<attributeTypes>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+					</attributeTypes>
+				</property>
+				<property key="zoneLowRedEnd" type="attribute" entityProperty="zoneEntity" required="false">
+					<caption>zoneLowRedEnd</caption>
+					<category>Zones</category>
+					<description>The attribute that specifies the maximum low red value</description>
+					<attributeTypes>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+					</attributeTypes>
+				</property>
+				<property key="zoneHighRedEnd" type="attribute" entityProperty="zoneEntity" required="false">
+					<caption>Max</caption>
+					<category>Zones</category>
+					<description>The attribute that specifies the maximum red value</description>
+					<attributeTypes>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+					</attributeTypes>
+				</property>
+				<property key="zoneHighOrangeEnd" type="attribute" entityProperty="zoneEntity" required="false">
+					<caption>zoneHighOrangeEnd</caption>
+					<category>Zones</category>
+					<description>The attribute that specifies the maximum orange value</description>
+					<attributeTypes>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+					</attributeTypes>
+				</property>
+			</properties>
+		</property>
+		<!-- Chart x axis -->
+		<property key="xastitle" type="string" defaultValue="" required="false">
+			<caption>Label x axis</caption>
+			<category>Chart x axis</category>
+			<description>Label of the x axis.</description>
+		</property>
+		<property key="showxticks" type="boolean" defaultValue="true">
+			<caption>Show x ticks</caption>
+			<category>Chart x axis</category>
+			<description></description>
+		</property>
+		<property key="dateaggregation" type="enumeration" defaultValue="day" required="true">
+			<caption>Date aggregation</caption>
+			<category>Chart x axis</category>
+			<description>Use this field to determine in which time interval data should be aggregated. Use 'No aggregation' if events on different timestamps (in milliseconds) should be displayed as unique points. Use 'Hour' if all data within the same hour should be aggregated, etc. The aggregation function of the individual series is applied. Usually 'count' or 'sum' are the most useful options. Note that this options influences datetime based series only.</description>
+			<enumerationValues>
+				<enumerationValue key="none">No aggregation</enumerationValue>
+				<enumerationValue key="hour">Per hour</enumerationValue>
+				<enumerationValue key="day">Per day</enumerationValue>
+				<enumerationValue key="week">Per week</enumerationValue>
+				<enumerationValue key="month">Per month</enumerationValue>
+				<enumerationValue key="year">Per year</enumerationValue>
+			</enumerationValues>
+		</property>
+		<property key="dateformatXaxis" type="enumeration" defaultValue="fulldate" required="true">
+			<caption>Date formatting</caption>
+			<category>Chart x axis</category>
+			<description>The date format which should be used (if applicable).</description>
+			<enumerationValues>
+				<enumerationValue key="fulldate">Full date</enumerationValue>
                 <enumerationValue key="day">Day only</enumerationValue>
                 <enumerationValue key="month">Month only</enumerationValue>
                 <enumerationValue key="monthday">Month and day</enumerationValue>
@@ -246,127 +392,274 @@ The aggregation function of the individual series is applied. Usually 'count' or
                 <enumerationValue key="yearmonth">Year and month</enumerationValue>
                 <enumerationValue key="time">Time</enumerationValue>
                 <enumerationValue key="datetime">Full date and time</enumerationValue>
-            </enumerationValues>
+                <enumerationValue key="daymonthyeartime">Day, month, year and time</enumerationValue>
+			</enumerationValues>
+		</property>
+		<property key="dateformat" type="enumeration" defaultValue="fulldate" required="true">
+			<caption>Date formatting tooltip</caption>
+			<category>Chart x axis</category>
+			<description>The date format which should be used in the tooltip (if applicable).</description>
+			<enumerationValues>
+				<enumerationValue key="fulldate">Full date</enumerationValue>
+                <enumerationValue key="day">Day only</enumerationValue>
+                <enumerationValue key="month">Month only</enumerationValue>
+                <enumerationValue key="monthday">Month and day</enumerationValue>
+                <enumerationValue key="weekyear">Week and Year</enumerationValue>
+                <enumerationValue key="year">Year only</enumerationValue>
+                <enumerationValue key="yearmonth">Year and month</enumerationValue>
+                <enumerationValue key="time">Time</enumerationValue>
+                <enumerationValue key="datetime">Full date and time</enumerationValue>
+                <enumerationValue key="daymonthyeartime">Day, month, year and time</enumerationValue>
+			</enumerationValues>
+		</property>
+		<property key="uselinearscaling" type="boolean" defaultValue="true">
+			<caption>Use linear scaling</caption>
+			<category>Chart x axis</category>
+			<description>If true, the datapoints are scaled along the x axis according to the x value, so gaps might be produces. If false, all data points are distributed uniformly. That is, the horizontal distance between two points is constant, regardless the x value. Note that this property only applies for date or numeric X values.
+			</description>
+		</property>
+		<!-- Chart y axis -->
+		<property key="yastitle" type="string" defaultValue="" required="false">
+			<caption>Label y axis</caption>
+			<category>Chart y axis</category>
+			<description>Label of the y axis.</description>
+		</property>
+		<property key="showyticks" type="boolean" defaultValue="true">
+			<caption>Show y ticks</caption>
+			<category>Chart y axis</category>
+			<description></description>
+		</property>
+		<property key="EnableyAxisMin" type="boolean" defaultValue="false">
+			<caption>Enable y axis min</caption>
+			<category>Chart y axis</category>
+			<description>If true, the chart will use the value specified at "y axis min" as minimum of the y axis.</description>
+		</property>
+		<property key="yAxisMin" type="integer" defaultValue="0" required="true">
+			<caption>Y axis min</caption>
+			<category>Chart y axis</category>
+			<description>The value used as minimum of the y axis.</description>
+		</property>
+		<property key="Absolute" type="boolean" defaultValue="false">
+			<caption>Absolute value</caption>
+			<category>Chart y axis</category>
+			<description>Use the absolute y-value.</description>
+		</property>
+		<property key="yunit1" type="string" required="false">
+			<caption>Y axis unit</caption>
+			<category>Chart y axis</category>
+			<description>The unit of the first y axis, for example: 'min.' or 'age'</description>
+		</property>
+		<property key="yunit1prefix" type="boolean" defaultValue="true">
+			<caption>Y axis unit position</caption>
+			<category>Chart y axis</category>
+			<description>The location of the unit of the first y axis (true = prefix, false = suffix)</description>
+		</property>
+		<property key="yastitle2" type="string" defaultValue=""
+		required="false">
+			<caption>Secondary y axis label</caption>
+			<category>Chart y axis</category>
+			<description>Label of the secondary y axis. This axis will be used when the 'use default axis' of a serie is set to false. (Highcharts only)</description>
+		</property>
+		<property key="yunit2" type="string" required="false">
+			<caption>Secondary y axis unit</caption>
+			<category>Chart y axis</category>
+			<description>The unit of the secondary y axis, for example: 'min.' or 'age'</description>
+		</property>
+		<!-- Filter -->
+		<property key="constraintentity" type="entity" required="false">
+			<caption>Filter entity</caption>
+			<category>Filter</category>
+			<description>This should be the same entity as selectied in the 'Chart Series' and is required in order to use filtering. Leave this property empty is filtering should not be enabled.</description>
+		</property>
+		<property key="stilldoesntmatter" type="object" isList="true" required="false">
+			<caption>Available filters</caption>
+			<category>Filter</category>
+			<description>Use this property to define which filters the user can apply. </description>
+			<properties>
+				<property key="filtername" type="string" defaultValue="" required="true">
+					<caption>Caption</caption>
+					<category>Filter</category>
+					<description></description>
+				</property>
+				<property key="filterattr" type="attribute" entityProperty="../constraintentity" required="true" isPath="optional" pathType="reference">
+					<caption>Filter attribute</caption>
+					<category>Filter</category>
+					<description>The attribute to filter. Note that filters are applied before the data aggregation functions. If a reference is used, only items actually used in the data are selectable.</description>
+					<attributeTypes>
+						<attributeType name="AutoNumber"/>
+						<attributeType name="Boolean"/>
+						<attributeType name="Currency"/>
+						<attributeType name="DateTime"/>
+						<attributeType name="Enum"/>
+						<attributeType name="Float"/>
+						<attributeType name="Decimal"/>
+						<attributeType name="Integer"/>
+						<attributeType name="Long"/>
+						<attributeType name="String"/>
+					</attributeTypes>
+				</property>
+			</properties>
+		</property>
+		<!-- Appearance -->
+		<property key="showlegend" type="boolean" defaultValue="true">
+			<caption>Show legend</caption>
+			<category>Appearance</category>
+			<description></description>
+		</property>
+		<property key="showhover" type="boolean" defaultValue="true">
+			<caption>Show hover</caption>
+			<category>Appearance</category>
+			<description></description>
+		</property>
+		<property key="showcrosshairs" type="boolean" defaultValue="false">
+			<caption>Show crosshairs</caption>
+			<category>Appearance</category>
+			<description></description>
+		</property>
+		<property key="sparkline" type="boolean" defaultValue="false">
+			<caption>Show as sparkline</caption>
+			<category>Appearance</category>
+			<description></description>
+		</property>
+		<property key="enablezoom" type="boolean" defaultValue="false">
+			<caption>Enable zoom</caption>
+			<category>Appearance</category>
+			<description>Whether the user can zoom in on a subset of the data. Highcharts only. </description>
+		</property>
+		<property key="sharedtooltip" type="boolean" defaultValue="false">
+			<caption>Shared tooltip</caption>
+			<category>Appearance</category>
+			<description>Whether to display the values in a shared tooltip. </description>
+		</property>
+		<property key="autorefresh" type="boolean" defaultValue="false">
+			<caption>Auto refresh</caption>
+			<category>Appearance</category>
+			<description>If true, the chart will be re-rendered when the context object changes. </description>
+		</property>
+		<property key="polltime" type="integer" defaultValue="0">
+			<caption>Poll for updates</caption>
+			<category>Appearance</category>
+			<description>Refresh time in seconds.</description>
+		</property>
+		<property key="inverted" type="boolean" defaultValue="false">
+			<caption>Swap axes</caption>
+			<category>Appearance</category>
+			<description>Enabling this property will swap the x and y axis of the chart. Highcharts only. </description>
+		</property>
+		<property key="listentogrid" type="boolean" defaultValue="false">
+			<caption>Listen to grid</caption>
+			<category>Appearance</category>
+			<description>If true, the series will be updated based on the listen-to-grid selection.</description>
+		</property>
+		<property key="stacking" type="string" defaultValue="null">
+			<caption>Stacking</caption>
+			<category>Appearance</category>
+			<description>Whether to stack the values of each series on top of each other. Possible values are null to disable, "normal" to stack by value or "percent". </description>
+		</property>
+		<property key="column_pointpadding" type="string" defaultValue="0.1">
+            <caption>Column point padding</caption>
+            <category>Appearance</category>
+            <description>Padding between each column or bar, in x axis units. Defaults to 0.1.</description>
         </property>
-        <property key="uselinearscaling" type="boolean" defaultValue="true">
-            <caption>Use linear scaling</caption>
-            <category>Chart X Axis</category>
-            <description>If true, the datapoints are scaled along the X Axis according to the x value, so gaps might be produces. If false, all data points are distributed uniformly. That is, the horizontal distance between two points is constant, regardless the x value. Note that this property only applies for date or numeric X values.
-            </description>
+		<property key="column_grouppadding" type="string" defaultValue="0.2">
+            <caption>Column group padding</caption>
+            <category>Appearance</category>
+            <description>Padding between each value groups, in x axis units. Defaults to 0.2.</description>
         </property>
-        <property key="showxticks" type="boolean" defaultValue="true">
-            <caption>Show X axis ticks</caption>
-            <category>Chart X Axis</category>
-            <description></description>
+		<property key="column_borderwidth" type="integer" defaultValue="1">
+            <caption>Column border width</caption>
+            <category>Appearance</category>
+            <description>The width of the border surrounding each column or bar. Defaults to 1.</description>
         </property>
-
-        <property key="yastitle" type="string" defaultValue="" required="false">
-            <caption>Y axis label</caption>
-            <category>Chart Y Axis</category>
-            <description>Label of the Y axis.</description>
-        </property> <property key="yunit1" type="string" required="false">
-            <caption>Y Axis unit</caption>
-            <category>Chart Y Axis</category>
-            <description>The unit of the first Y axis, for example: 'min.' or 'age'</description>
-        </property>
-        <property key="yastitle2" type="string" defaultValue=""
-        required="false">
-            <caption>Secondary Y axis label</caption>
-            <category>Chart Y Axis</category>
-            <description>Label of the secondary Y axis. This axis will be used when the 'use default axis' of a serie is set to false. (Highcharts only)</description>
-        </property>
-        <property key="yunit2" type="string" required="false">
-            <caption>Secondary Y Axis unit</caption>
-            <category>Chart Y Axis</category>
-            <description>The unit of the secondary Y axis, for example: 'min.' or 'age'</description>
-        </property>
-        <property key="showyticks" type="boolean" defaultValue="true">
-            <caption>Show Y axis ticks</caption>
-            <category>Chart Y Axis</category>
-            <description></description>
-        </property>
-
-
-        <property key="constraintentity" type="entity" required="false">
-            <caption>Filter entity</caption>
-            <category>Filter</category>
-            <description>This should be the same entity as selectied in the 'Chart Series' and is required in order to use filtering. Leave this property empty is filtering should not be enabled.</description>
-        </property>
-        <property key="stilldoesntmatter" type="object" isList="true" required="false">
-            <caption>Available filters</caption>
-            <category>Filter</category>
-            <description>Use this property to define which filters the user can apply. </description>
-            <properties>
-                <property key="filtername" type="string" defaultValue=""
-                required="true">
-                    <caption>Caption</caption>
-                    <category>Filter</category>
-                    <description></description>
-                </property>
-                <property key="filterattr" type="attribute" entityProperty="../constraintentity" required="true" isPath="optional" pathType="reference">
-                    <caption>Filter attribute</caption>
-                    <category>Filter</category>
-                    <description>The attribute to filter. Note that filters are applied before the data aggregation functions. If a reference is used, only items actually used in the data are selectable.</description>
-                    <attributeTypes>
-                      <attributeType name="AutoNumber"/>
-                      <attributeType name="Boolean"/>
-                      <attributeType name="Currency"/>
-                      <attributeType name="DateTime"/>
-                      <attributeType name="Enum"/>
-                      <attributeType name="Float"/>
-                      <attributeType name="Integer"/>
-                      <attributeType name="Long"/>
-                      <attributeType name="String"/>
-                    </attributeTypes>
-                </property>
-            </properties>
-        </property>
-
-
-        <property key="showlegend" type="boolean" defaultValue="true">
-            <caption>Show legend</caption>
-            <category>Features</category>
-            <description></description>
-        </property>
-        <property key="showhover" type="boolean"
-        defaultValue="true">
-            <caption>Show hover</caption>
-            <category>Features</category>
-            <description></description>
-        </property>
-        <property key="enablezoom" type="boolean" defaultValue="false">
-            <caption>Enable zoom</caption>
-            <category>Features</category>
-            <description>Whether the user can zoom in on a subset of the data. Highcharts only. </description>
-        </property>
-        <property key="inverted" type="boolean" defaultValue="false">
-            <caption>Swap axes</caption>
-            <category>Features</category>
-            <description>Enabling this property will swap the x and y axis of the chart. Highcharts only. </description>
-        </property>
-        <property key="polltime" type="integer" defaultValue="0">
-            <caption>Poll for updates</caption>
-            <category>Features</category>
-            <description>Refresh time in seconds.</description>
-        </property>
-        <property key="autorefresh" type="boolean" defaultValue="false">
-            <caption>Auto refresh</caption>
-            <category>Features</category>
-            <description>If true, the chart will be re-rendered when the context object changes. </description>
-        </property>
-        <property key="extraoptions" type="string" defaultValue="" required="false" multiline="true">
-            <caption>Extra options</caption>
-            <category>Features</category>
-            <description>
-This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
+		<!-- Plotbands -->
+		<property key="enablePlotbands" type="boolean" defaultValue="false">
+			<caption>Enable plotbands</caption>
+			<category>Plotbands</category>
+			<description>This will enable the possibility to plot colored plotbands on the y-axis.</description>
+		</property>
+		<property key="plotBandEntity" type="entity" required="false">
+			<caption>Plotband entity </caption>
+			<category>Plotbands</category>
+			<description>The entity that holds the plotband information</description>
+		</property>
+		<property key="highRedEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>Max plotband</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the maximum red value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<property key="highRedBegin" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>High-high</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the minimum red value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<property key="greenEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>High</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the maximum green value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<property key="greenBegin" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>Low</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the minimum green value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<property key="lowRedEnd" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>Low-low</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the maximum red value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<property key="lowRedBegin" type="attribute" entityProperty="plotBandEntity" required="false">
+			<caption>Min</caption>
+			<category>Plotbands</category>
+			<description>The attribute that specifies the minimum red value</description>
+			<attributeTypes>
+				<attributeType name="Float"/>
+				<attributeType name="Decimal"/>
+				<attributeType name="Integer"/>
+			</attributeTypes>
+		</property>
+		<!-- Customizing -->
+		<property key="extraoptions" type="string" defaultValue="" required="false" multiline="true">
+			<caption>Extra options</caption>
+			<category>Customizing</category>
+			<description>This property can be used to add additional options styling info (in JSON format) to the chart when constructing. This option is implementation specific.
 For Flot see: https://github.com/flot/flot/blob/master/API.md
 For Highcarts see: http://www.highcharts.com/ref/.
 
 Example: to use steps in the graph, and a red border around the legend specify:
 
 Flot: "{legend: { labelBoxBorderColor: 'red' }, series : { lines : { steps : 'true' } } }"
-Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }" </description>
-        </property>
-  </properties>
+Highcharts: "{legend: { borderColor : 'red' }, plotOptions: { line : { step : true } } }"</description>
+		</property>
+		<property key="debugging" type="boolean" defaultValue="false">
+			<caption>Debugging</caption>
+			<category>Customizing</category>
+			<description>If true, debugging information will be included in de console log.</description>
+		</property>
+		
+	</properties>
 </widget>
-
